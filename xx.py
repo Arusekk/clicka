@@ -132,7 +132,7 @@ for i in form:
 try:
 	d['weeks']
 except:
-	d['weeks'] = 2
+	d['weeks'] = 18
 
 cu.execute("select username, imie from users")
 res = cu.fetchall()
@@ -141,7 +141,7 @@ belonging_groups = [int(x) for x in sel_list('select groupid from group_belongin
 nazwy_grup_l = select('select id, nazwa from groups')
 nazwy_grup = {str(x[0]): str(x[1]) for x in nazwy_grup_l}
 
-def postsbysql(query):
+def postsbysql(query, where='a=view'):
 	#czy nowe wiadomości; nieodebrane wiadomości:
 	last_mes_query = sel_list('select czas from last_mes_query where username="%s"'%username)[0]
 	last_rec_mes = select('select czas, od from messages where do="%s" order by czas desc'%username)
@@ -213,7 +213,10 @@ def postsbysql(query):
 		</form>'''.format(post_id))
 		print('</div>')		
 		print('</div>')
-
+	print('<span id="bottom"></span>')
+	try:
+		print('<a href=xx.py?{}&weeks={}#bottom><h3>Pokaż starsze posty…</h3></a>'.format(where, int(d['weeks']) + 20	))
+	except: pass
 
 if act == "publish_b":
 	if d['target'] == "group":
@@ -246,7 +249,8 @@ elif act == "view":
 		print(m['entryp_o'].replace('{}', 'group&id={}'.format(i)), nazwy_grup[str(i)],'</a></div>')
 	print("</div>", m['main_o'])
 
-	postsbysql('select * from contents where datediff(now(), date) <= 7*{} order by date desc'.format(d['weeks']))
+	#postsbysql('select * from contents where datediff(now(), date) <= 7*{} order by date desc'.format(d['weeks']))
+	postsbysql('select * from contents order by date desc limit {}'.format(d['weeks']))
 
 elif act == "like_b":
 	resp = 'inni'
@@ -262,6 +266,7 @@ elif act == "like_b":
 
 elif act == "comment_b":
 	select('insert into comments values ("%s", %d, now(), "%s")'%(username, int(d['w']), d['content']))
+	select('update contents set date = now() where id = %s'%d['w'])
 	print('Location: xx.py?a=view#%d\n'%int(d['w']))
 
 elif act == "logout":
@@ -314,7 +319,7 @@ elif act == "group":
 	if group_admin == username:
 		print('<h3>Jesteś administratorem tej grupy. <a href="xx.py?a=panel&g=%s"><u>Zarządzaj członkami.</u></a></h3>'%d['id'])
 
-	postsbysql('select * from contents where parent_t = 2 and parent = "{}" order by date desc'.format(d['id']))
+	postsbysql('select * from contents where parent_t = 2 and parent = "{}" order by date desc'.format(d['id']), where='a=group&id=%s'%d['id'])
 
 elif act == "panel":
 	group_admin = sel_list('select admin from groups where id=%s'%d['g'])[0]
@@ -365,7 +370,7 @@ elif act == 'space':
 
 	print('<div style="display: block"><img style="float: none" src="xx.py?a=img&img=_profile_%s&size=large"><h1>%s</h1><br></div>'%(uid, imiona[uid]))
 	
-	postsbysql('select * from contents where parent_t = 1 and parent = "%s" order by date desc'%uid)
+	postsbysql('select * from contents where parent_t = 1 and parent = "%s" order by date desc limit %s'%(uid, d['weeks']), where='a=space&user=%s'%uid)
 	#...
 
 elif act == "register":
