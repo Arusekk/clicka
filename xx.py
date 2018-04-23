@@ -443,13 +443,14 @@ elif act == 'create_group_b':
 
 elif act == 'img':
 	import sys
-	sys.stdout.buffer.write(b'Content-type: image/png\n\n')
+	sys.stdout.buffer.write(b'Content-type: image/png\n')
 
 	if 'size' in d and d['size'] == '__system':
 		sys.stdout.buffer.write(open('system_images/'+d['img'], 'rb').read())
 		exit()
 	
 	if str.startswith(d['img'], '_profile_'):
+		sys.stdout.buffer.write(b'\n')
 		profusr = d['img'].replace('_profile_', '')
 		hasprofilepic = select('select hasprofilepic from users where username = "%s"'%profusr)[0][0]
 		if hasprofilepic in (1, '1'):
@@ -459,6 +460,7 @@ elif act == 'img':
 			sys.stdout.buffer.write(open('images/__implementation__default__%s.png'%(d['size']), 'rb').read())
 		exit(0)
 	else:
+		sys.stdout.buffer.write(b'Cache-control: max-age=1000000\n\n')
 		p_t, p = select('select parent_t, parent from contents where img = "%s"'%d['img'])[0]
 		if p_t == 2 and int(p) not in belonging_groups:			
 			exit(0)
