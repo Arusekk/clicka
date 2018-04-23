@@ -201,7 +201,12 @@ def postsbysql(query, where='a=view'):
 		comments = select('select * from comments where parent=%d'%post_id)
 		comments_count = sel_list('select count(*) from comments where parent=%d'%post_id)[0]
 		print('''<div class="commentsbox" onclick="show_comments({})">Pokaż komentarze ({})</div>'''.format(post_id, comments_count))
-		print('<div class="comments" id="c{}">'.format(post_id))
+		
+		if(int(comments_count) in range(1, 4)):
+			print('<div class="comments" id="c{}" lt3>'.format(post_id))
+		else:
+			print('<div class="comments" id="c{}">'.format(post_id))
+
 		for n, i in enumerate(comments):
 			if n:
 				print('<br>')

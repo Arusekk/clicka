@@ -6,9 +6,7 @@
 function main()
 {
 	$(".comments").hide();
-	//alert(window.location)
-	if(String(window.location).search(new RegExp('a=mes')) != -1)
-		;//setInterval(location.reload(), 3000);
+	$('[lt3]').show();
 }
 
 $(document).ready(main);
