@@ -80,7 +80,7 @@ int main() {
   int weeks;
   bool logged = 0;
   std::vector<std::string> cookies, get, post;
-  char *get_str = getenv("QUERY_std::string");
+  char *get_str = getenv("QUERY_STRING");
   char *cookie_p = getenv("HTTP_COOKIE");
   sql::Driver *driver;
   sql::Connection *con;
