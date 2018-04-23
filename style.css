@@ -1,0 +1,325 @@
+#upper-bar
+{
+  background: #0059B2;
+  height: 81;
+  width: 100%; 
+  position: fixed; 
+  display: inline-block;
+  position: absolute;
+  left: 0;
+}
+
+body
+{
+  background-color: #259BF5;
+  text-align: left;
+  margin: 0;
+  color: white;
+  font-family: Arial;
+  overflow-x: hidden;
+}
+
+img
+{
+  border-radius: 5px;
+  float: left;
+}
+
+a
+{
+  /*background-color: yellow;*/
+  text-decoration: none;
+  color: white;
+}
+
+#left-bar
+{
+  float: left;
+  display: block;
+  margin-top: 81px;
+  width: 15%;
+  background: #09529B;
+  border-right: 1px solid red;
+  border-top: 1px solid cyan;
+  border-bottom: 1px solid red;
+  height: 100%;
+  padding-top: 25px;
+  /*padding: 15px;*/
+  /*overflow: hidden*/
+}
+
+.itext
+{
+  background: #B0FFFD; 
+  border: 1px solid cyan;
+  border-radius: 5px; 
+  /*font-style: oblique; */
+  font-weight: bold;
+  margin-top: 3px; 
+  width: 50%;
+  resize: vertical;
+  height: 200px;
+  padding: none;
+  color: orange;
+
+}
+.itext:focus
+{
+  background: lightblue;
+}
+
+input.itext
+{
+  background: #B0FFFD; 
+  border: 1px solid cyan;
+  border-radius: 5px; 
+  /*font-style: oblique; */
+  font-weight: bold;
+  margin-top: 3px; 
+  width: 50%;
+  resize: vertical;
+  height: 45px;
+  padding: none;
+  color: darkblue;
+
+}
+input.itext:focus
+{
+  background: lightblue;
+}
+
+#last_fixed_entry
+{
+  border-bottom: 2px ridge cyan;
+}
+
+.fixed_entry
+{
+  display: block;
+  width: 100%;
+  height: 15px;
+  border-top: 1px solid cyan;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  text-align: center;
+  font-weight: bold;
+}
+.fixed_entry:hover
+{
+  background: #00DEFF;
+}
+
+.fixed_entry:active
+{
+  background: yellow;
+}
+
+.entry
+{
+  display: block;
+  width: 100%;
+  height: 15px;
+  border-top: 1px solid cyan;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  text-align: center;
+}
+.entry:hover
+{
+  background: #00DEFF;
+}
+
+.entry:active
+{
+  background: yellow;
+}
+
+.news
+{
+  width: 20px;
+  height: 20px;
+  background: red;
+  float: right;
+  display: inline;
+  border-radius: 5px;
+  vertical-align: middle;
+}
+
+#main
+{
+  margin-top: 81px;
+  margin-left: 15%;
+  padding: 24px;
+  display: block;
+  position: absolute;
+  width: 85%;
+  text-align: center;
+}
+
+.post
+{
+  display: inline-block;
+  border: 4px #001E70 inset;
+  width: 50%;
+  /*height: 300px;*/
+  padding: 10px;
+  margin-bottom: 25px;
+}
+
+.author
+{
+  display: block; 
+  width: 100%; 
+  text-align: left; 
+  height: 50px
+}
+
+.author_name
+{
+  padding-left: 5px; 
+  font-size: 19; 
+  vertical-align: 15px;
+}
+
+.content
+{
+  position: relative;
+  top: 15px;
+  display: inline-block;
+  text-align: justify;
+  margin-bottom: 40px;
+}
+
+.likebox
+{
+  text-align: center;
+}
+
+.like
+{
+  background: green; color: lime; padding: 2px; width: 48%; display: inline-block;
+}
+.like:hover
+{
+  color: white;
+  font-weight: bold;
+}
+.like:active
+{
+  background: yellow;
+}
+
+.dislike
+{
+  background: red; color: orange; padding: 2px; width: 48%; text-align: center; display: inline-block
+}
+.dislike:hover
+{
+  color: white;
+  font-weight: bold;
+  background: purple;
+}
+.dislike:active
+{
+  background: yellow;
+}
+
+.commentsbox
+{
+  text-align: center;
+  color: white;
+  display: block;
+  margin-top: 5px;
+  padding: 5px;
+  /*width: 100%;*/
+  font-size: 12;
+  font-weight: bold;
+  background: #0066CB;
+}
+.commentsbox:hover
+{
+  background: black;
+}
+.commentsbox:active
+{
+  background: yellow;
+}
+
+.comments
+{
+  text-align: left;
+  color: white;
+  display: block;
+  margin-top: 5px;
+  /*width: 100%;*/
+  /*font-weight: bold;*/
+}
+
+.comment
+{
+  display: inline-block;
+  margin: 3px;
+}
+
+.message
+{
+  display: inline-block;
+  border: 2px solid black;
+  margin: 5px;
+  background: #09529B;
+  border-radius: 3px;
+  width: 60%;
+  float: center;
+}
+
+.enum
+{
+  display: inline-block;
+  border: 2px solid black;
+  margin: 5px;
+  background: #09529B;
+  border-radius: 3px;
+  width: 60%;
+  float: center; 
+  color: white;
+  padding: 5px;
+  vertical-align: bottom;
+  font-weight: bold;
+}
+.enum:hover
+{
+  background: #00DEFF;
+  font-style: oblique;
+}
+.desc
+{
+  font-size: 10;
+  font-weight: normal;
+  font-style: oblique;
+  text-align: center;
+}
+button
+{
+  background-color: blue;
+  border: none;
+  padding: 5px;
+  margin: 2px;
+  color: white;
+}
+button:hover
+{
+  background-color: cyan;
+}
+
+.button
+{
+  background-color: blue;
+  border: none;
+  padding: 5px;
+  margin: 2px;
+  color: white;
+}
+.button:hover
+{
+  background-color: cyan;
+}
