@@ -450,9 +450,10 @@ elif act == 'img':
 	import sys
 	sys.stdout.buffer.write(b'Content-type: image/png\n')
 
-	if 'size' in d and d['size'] == '__system':
-		sys.stdout.buffer.write(open('system_images/'+d['img'], 'rb').read())
-		exit()
+	#if 'size' in d and d['size'] == '__system':
+	#	sys.stdout.buffer.write(b'Cache-control: max-age=1000000\n\n')
+	#	sys.stdout.buffer.write(open('system_images/'+d['img'], 'rb').read())
+	#	exit()
 	
 	if str.startswith(d['img'], '_profile_'):
 		sys.stdout.buffer.write(b'\n')
