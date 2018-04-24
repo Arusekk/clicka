@@ -51,7 +51,7 @@ try:
 	except: pass
 except Exception as e:
 	if act not in ('register', 'register_b', 'login_b'):
-		print("\nLocation: xx.cgi\n")
+		print("Location: xx.cgi\n")
 		print(e)
 		print(sid)
 		exit(0)
@@ -529,7 +529,7 @@ elif act == "login_b":
 	select('delete from sessions where username="%s"'%login)
 	select('insert into sessions values("%s", "%s", now(), 0)'%(sid, login))
 	print('Set-Cookie: sid=%s'%sid)
-	print('\nLocation: xx.py?a=view\n')
+	print('Location: xx.py?a=view\n')
 	print("Ok")
 
 else:
