@@ -40,7 +40,7 @@ try:
 		for l in sid:
 			if l == ';':
 				sid = sid.split(';')[0]
-				continue
+				break
 			elif l not in 'abcdefghijklmnopqrstuvwxyz':
 				print('\nTwój sid jest nieprawdiłowy. Jeśli uważasz, że to nie twoja wina, zgłoś błąd w <a href="https://anx.nazwa.pl:65000/antek/clicka/issues">bug trackerze.</a>')
 				print(sid)
