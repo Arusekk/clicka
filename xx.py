@@ -16,6 +16,19 @@ except:
 db = pymysql.connect("localhost", "antek", open("/var/www/mysql_password").read()[:-1], "xx", charset="utf8")
 cu = db.cursor()
 
+def select(query):
+	cu.execute(query)
+	res = cu.fetchall()
+	return res
+
+def sel_list(query):
+	cu.execute(query)
+	res = cu.fetchall()
+	l = list()
+	for i in res:
+		l.append(i[0])
+	return l
+
 try:
 	a = os.environ['HTTP_COOKIE']
 	while len(a) > 4 and not str.startswith(a, 'sid='):
@@ -33,28 +46,19 @@ try:
 	cu.execute('select username from sessions where sid = "{}"'.format(sid))
 	c = cu.fetchall()
 	username = c[0][0]
+	try:
+		select('insert into activities values ("%s", now(), "%s", "%s")'%(username, os.getenv("REQUEST_URI"), os.getenv('REMOTE_ADDR')))
+	except: pass
 except Exception as e:
 	if act not in ('register', 'register_b', 'login_b'):
-		print("Location: xx.cgi\n")
+		print("\nLocation: xx.cgi\n")
+		print(e)
 		print(sid)
 		exit(0)
 	username = None
 
 m = dict();
 fl = open("html").read().splitlines()
-
-def select(query):
-	cu.execute(query)
-	res = cu.fetchall()
-	return res
-
-def sel_list(query):
-	cu.execute(query)
-	res = cu.fetchall()
-	l = list()
-	for i in res:
-		l.append(i[0])
-	return l
 
 for i in range(0, len(fl), 2):
 	m[fl[i]] = fl[i+1]
@@ -525,7 +529,7 @@ elif act == "login_b":
 	select('delete from sessions where username="%s"'%login)
 	select('insert into sessions values("%s", "%s", now(), 0)'%(sid, login))
 	print('Set-Cookie: sid=%s'%sid)
-	print('Location: xx.py?a=view\n')
+	print('\nLocation: xx.py?a=view\n')
 	print("Ok")
 
 else:
