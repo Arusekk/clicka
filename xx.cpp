@@ -156,8 +156,15 @@ int main() {
     std::cin >> post_str;
     if (post_str.size()) {
       post = split(post_str, "=&");
-      for (auto a : post)
+      for (auto & a : post)
+      {
+        for (auto & c : a)
+        {
+          if (int(c) > 125 or int(c) < 32)
+            c = '*';
+        }
         escape(a);
+      }
     }
   }
 
@@ -193,8 +200,7 @@ int main() {
 
   // zrobiono init, sprawdzamy czy jest sesja
   try {
-    res = stmt->executeQuery("select username from sessions where sid = \"" +
-                             sid + "\"");
+    res = stmt->executeQuery("select username from sessions where sid = \"" + sid + "\"");
   } catch (sql::SQLException &e) {
     std::cerr << "# ERR: SQLException in " << __FILE__;
     std::cerr << "(" << __FUNCTION__ << ") on line " << __LINE__ << std::endl;
@@ -222,7 +228,7 @@ int main() {
   if (act == "")
     act = "view";
 
-  if (act == "login_b") {
+  /* if (act == "login_b") {
   LOGIN_B:
     std::string login, passwd;
     bool ok = 0;
@@ -290,7 +296,8 @@ int main() {
               << std::endl;
 
     return 0;
-  }
+  }*/
+  LOGIN_B:
 
   if (act == "login") {
   LOGIN:

@@ -26,14 +26,17 @@ try:
 	  sid = b[1]
 	  for l in sid:
 	  	if l not in 'abcdefghijklmnopqrstuvwxyz':
+	  		print('\nTwój sid jest nieprawdiłowy. Jeśli uważasz, że to nie twoja wina, zgłoś błąd w <a href="https://anx.nazwa.pl:65000/antek/clicka/issues">bug trackerze.</a>')
+	  		print(sid)
 	  		exit()
 
 	cu.execute('select username from sessions where sid = "{}"'.format(sid))
 	c = cu.fetchall()
 	username = c[0][0]
 except Exception as e:
-	if act not in ('register', 'register_b'):
+	if act not in ('register', 'register_b', 'login_b'):
 		print("Location: xx.cgi\n")
+		print(sid)
 		exit(0)
 	username = None
 
@@ -126,6 +129,11 @@ for i in form:
 	except:
 		print('\n\n', form[i])
 		exit(0)
+	#if i == 'pswd1' or i == 'pswd2' or i == 'passwd':
+	#	for j in range(len(v)):
+	#		if ord(v[j]) not in range(32, 126):
+	#			v = v.replace(v[j], '*')
+
 	v = cgi.escape(v)
 	v = v.replace('"', "&quot;")
 	v = v.replace("'", "&#8217;")
@@ -490,6 +498,30 @@ elif act == 'img':
 			exit(0)
 		sys.stdout.buffer.write(open('images/%s'%d['img'], 'rb').read())
 		exit(0)
+
+elif act == "login_b":
+	login = d['login']
+	passwd = d['passwd']
+	# ok = False
+	import hashlib
+	sha = hashlib.sha256()
+	sha.update(passwd.encode('utf-8'))
+	hashed = sha.hexdigest().upper()
+
+	s = select('select username, imie from users where username="%s" and passwd="%s"'%(login, hashed))
+	try:
+		username = s[0][0]
+	except:
+		print('\nNieprawidłowy login lub hasło :(')
+		exit()
+
+	import random
+	sid = ''.join(chr(random.choice(range(ord('a'), ord('z')+1))) for x in range(127))
+	select('delete from sessions where username="%s"'%login)
+	select('insert into sessions values("%s", "%s", now(), 0)'%(sid, login))
+	print('Set-Cookie: sid=%s'%sid)
+	print('Location: xx.py?a=view\n')
+	print("Ok")
 
 else:
 	print('\n', m['nieznany_act'])
