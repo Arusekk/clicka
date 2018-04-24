@@ -467,6 +467,11 @@ elif act == 'create_group_b':
 		print("\nNazwa jest już zajęta :(")
 		exit(0)
 
+	try:
+		d['opis']
+	except KeyError:
+		d['opis'] = ''
+
 	select('insert into groups values(0, "%s", %d, "%s", 0, "%s")'%(d['nazwa'], int(d['typ']), d['opis'], username))
 	groupid = sel_list('select id from groups where nazwa = "%s"'%d['nazwa'])[0]
 	select('insert into group_belonging values(%d, "%s", now())'%(int(groupid), username))
