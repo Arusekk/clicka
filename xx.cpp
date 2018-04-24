@@ -234,11 +234,11 @@ int main() {
         passwd = post[i + 1];
     }
 
+    std::string bare = passwd;
     passwd = sha256(passwd);
 
     try {
-      std::string q = "select username, imie from users where passwd = "
-                      "\"{passwd}\" and username = \"{login}\"";
+      std::string q = "select username, imie from users where passwd = \"{passwd}\" and username = \"{login}\"";
       replace_all(q, "{passwd}", passwd);
       replace_all(q, "{login}", login);
       res = stmt->executeQuery(q);
@@ -254,6 +254,7 @@ int main() {
 
     if (!ok) {
       std::cout << "\nPodano nieprawidłowy login lub hasło :(\n";
+      std::cout << "Podano: " << bare <<  "Jego sha256 wynosi: "  << passwd;
       return 0;
     }
 
