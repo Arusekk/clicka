@@ -445,6 +445,7 @@ elif act == "register_b":
 	select('update invitations set active = 0 where link = "{}"'.format(d['id']))
 	select('update invitations set registered = now() where link = "{}"'.format(d['id']))
 	select('insert into users values("{}", "{}", "{}", 0, "{}")'.format(d['username'], pswd, d['imie'], d['id']))
+	select('insert into last_mes_query values("{}", now())'.format(d['username']))
 	print("Location: xx.cgi\n")
 	print('\n')
 
