@@ -75,8 +75,7 @@ std::string srpl(std::string s, int c, ...) {
 }
 
 int main() {
-  std::string post_str, act, sid, username, z, yt, img, size, content, foreign,
-      error;
+  std::string post_str, act, sid, username, z, yt, img, size, content, foreign, error;
   int weeks;
   bool logged = 0;
   std::vector<std::string> cookies, get, post;
@@ -261,7 +260,7 @@ int main() {
     char sid[130];
     for (int i = 0; i < 128; i++) {
       do
-        sid[i] = static_cast<char>(rnd(48, 122));
+        sid[i] = static_cast<char>(rnd(97, 122));
       while (sid[i] == '"' or sid[i] == '=' or sid[i] == ';');
     }
     sid[128] = 0;

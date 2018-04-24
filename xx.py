@@ -24,11 +24,14 @@ try:
 
 	if(b[0] == "sid"):
 	  sid = b[1]
+	  for l in sid:
+	  	if l not in 'abcdefghijklmnopqrstuvwxyz':
+	  		exit()
 
 	cu.execute('select username from sessions where sid = "{}"'.format(sid))
 	c = cu.fetchall()
 	username = c[0][0]
-except:
+except Exception as e:
 	if act not in ('register', 'register_b'):
 		print("Location: xx.cgi\n")
 		exit(0)
