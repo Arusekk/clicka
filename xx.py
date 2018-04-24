@@ -323,13 +323,15 @@ elif act == "group":
 	group_admin = sel_list('select admin from groups where id=%s'%d['id'])[0]
 	if group_admin == username:
 		print('<h3>Jesteś administratorem tej grupy. <a href="xx.py?a=panel&g=%s"><u>Zarządzaj członkami.</u></a></h3>'%d['id'])
+	if group_type in (1, '1') and int(d['id']) not in belonging_groups:
+		print('<h3>Nie należysz do tej otwartej grupy. <a href="xx.py?a=group_add&groupid=%s&whom=%s&return=group"><u>Dołącz do grupy</u></a></h3>'%(d['id'], username))
 
 	postsbysql('select * from contents where parent_t = 2 and parent = "{}" order by date desc'.format(d['id']), where='a=group&id=%s'%d['id'])
 
 elif act == "panel":
 	group_admin = sel_list('select admin from groups where id=%s'%d['g'])[0]
 	if group_admin != username:
-		print('<h1>Nie jesteś administratorem tej grupy!</h1>')
+		print('\n<h1>Nie jesteś administratorem tej grupy!</h1>')
 		exit()
 
 	print("\n<h3>Do grupy należą:</h1>")
@@ -345,12 +347,18 @@ elif act == "panel":
 
 elif act == "group_add":
 	group_admin = sel_list('select admin from groups where id=%s'%d['groupid'])[0]
-	if group_admin != username:
-		print('<h1>Nie jesteś administratorem tej grupy!</h1>')
+	group_type = sel_list('select typ from groups where id=%s'%d['groupid'])[0]
+
+	if group_admin != username and group_type not in (1, '1'):
+		print('\n<h1>Nie jesteś administratorem tej grupy!</h1>')
 		exit()
 
 	select('insert into group_belonging values(%s, "%s", now())'%(d['groupid'], d['whom']))
-	print('Location: xx.py?a=panel&g=%s\n'%d['groupid'])
+	try:
+		if d['return']== 'group':
+			print('Location: xx.py?a=group&id=%s\n'%d['groupid'])
+	except:
+		print('Location: xx.py?a=panel&g=%s\n'%d['groupid'])
 
 elif act == "group_rem":
 	group_admin = sel_list('select admin from groups where id=%s'%d['groupid'])[0]
