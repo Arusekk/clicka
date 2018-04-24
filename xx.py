@@ -141,11 +141,11 @@ belonging_groups = [int(x) for x in sel_list('select groupid from group_belongin
 nazwy_grup_l = select('select id, nazwa from groups')
 nazwy_grup = {str(x[0]): str(x[1]) for x in nazwy_grup_l}
 
-def postsbysql(query, where='a=view'):
+def postsbysql(query, where='a=view', display_from_open_groups = False):
 	#czy nowe wiadomości; nieodebrane wiadomości:
 	last_mes_query = sel_list('select czas from last_mes_query where username="%s"'%username)[0]
 	last_rec_mes = select('select czas, od from messages where do="%s" order by czas desc'%username)
-	
+        	
 	unread_displayed = set()
 
 	for j in last_rec_mes:
@@ -168,7 +168,8 @@ def postsbysql(query, where='a=view'):
 		parent = i[3]
 		img = i[5]
 		if str(parent_t) == '2' and str(parent) not in [str(x) for x in belonging_groups]:
-			continue
+			if not display_from_open_groups:
+				continue
 
 		likes = select('select count(user) from likes where parent_t = 0 and parent = "{}" and value = 1'.format(i[0]))[0][0]
 		dislikes = select('select count(user) from likes where parent_t = 0 and parent = "{}" and value = 0'.format(i[0]))[0][0]
@@ -315,7 +316,7 @@ elif act == "group":
 	
 	if int(d['id']) not in belonging_groups and group_type not in (1, '1'):
 		print("\n<h1>Nie należysz do tej grupy!</h1>")
-		print(belonging_groups)
+		#print(belonging_groups)
 		exit(0)
 
 	print("\n", m['head'], m['body_o'], "</div>", m['main_o']) #TODO: wypisz grupy, w view już zrobiono
@@ -326,7 +327,7 @@ elif act == "group":
 	if group_type in (1, '1') and int(d['id']) not in belonging_groups:
 		print('<h3>Nie należysz do tej otwartej grupy. <a href="xx.py?a=group_add&groupid=%s&whom=%s&return=group"><u>Dołącz do grupy</u></a></h3>'%(d['id'], username))
 
-	postsbysql('select * from contents where parent_t = 2 and parent = "{}" order by date desc'.format(d['id']), where='a=group&id=%s'%d['id'])
+	postsbysql('select * from contents where parent_t = 2 and parent = "{}" order by date desc'.format(d['id']), where='a=group&id=%s'%d['id'], display_from_open_groups = True)
 
 elif act == "panel":
 	group_admin = sel_list('select admin from groups where id=%s'%d['g'])[0]
