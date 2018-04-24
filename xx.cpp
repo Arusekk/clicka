@@ -406,9 +406,7 @@ int main() {
     std::cout << "</div>" << M["main_o"] << std::endl;
     //
 
-    std::string q = "(select content, od, czas from messages where (od = "
-                    "\"{}\" and do = \"{}\") or (od = \"{}\" and do = \"{}\") "
-                    "order by czas desc limit {}) order by czas asc";
+    std::string q = "(select content, od, czas from messages where (od = \"{}\" and do = \"{}\") or (od = \"{}\" and do = \"{}\") order by czas desc limit {}) order by czas asc";
     rpl(q, 5, username, z, z, username, std::to_string(weeks));
     res = stmt->executeQuery(q);
 
