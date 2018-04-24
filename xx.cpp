@@ -545,7 +545,7 @@ int main() {
   //   return 0;
   // }
 
-  if (act == "dump") {
+  /*if (act == "dump") {
     std::string ip = "90.156.16.110";
     char *addr = getenv("REMOTE_ADDR");
     if (addr == NULL) {
@@ -563,7 +563,7 @@ int main() {
                 << std::endl;
     }
     return 0;
-  }
+  }*/
 
   std::cout << "\n" << M["nieznany_act"];
   return 0;
