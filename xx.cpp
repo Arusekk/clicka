@@ -76,7 +76,7 @@ std::string srpl(std::string s, int c, ...) {
 
 int main() {
   std::string post_str, act, sid, username, z, yt, img, size, content, foreign, error;
-  int weeks;
+  int weeks = 0;
   bool logged = 0;
   std::vector<std::string> cookies, get, post;
   char *get_str = getenv("QUERY_STRING");
