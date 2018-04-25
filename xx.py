@@ -66,7 +66,7 @@ fl = open("html").read().splitlines()
 for i in range(0, len(fl), 2):
 	m[fl[i]] = fl[i+1]
 
-m['head'] = m['head'].replace("{}", open("style.css").read())
+#m['head'] = m['head'].replace("{}", open("style.css").read())
 
 is_uploaded_image = False
 image_filename = ""
