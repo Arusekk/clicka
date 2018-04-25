@@ -97,7 +97,7 @@ int main() {
   for (unsigned int i = 0; i < vhtml.size(); i += 2) {
     M[vhtml[i]] = vhtml[i + 1];
   }
-  rpl(M["head"], 1, file("style.css"));
+  //rpl(M["head"], 1, file("style.css"));
   std::map<std::string, std::string> imiona;
   res = stmt->executeQuery("select username, imie from users");
   while (res->next())
