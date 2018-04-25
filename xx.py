@@ -150,7 +150,7 @@ for i in form:
 try:
 	d['weeks']
 except:
-	d['weeks'] = 18
+	d['weeks'] = 6
 
 cu.execute("select username, imie from users")
 res = cu.fetchall()
@@ -494,7 +494,7 @@ elif act == 'img':
 	#	exit()
 	
 	if str.startswith(d['img'], '_profile_'):
-		sys.stdout.buffer.write(b'\n')
+		sys.stdout.buffer.write(b'Cache-control: max-age=604800\n\n')
 		profusr = d['img'].replace('_profile_', '')
 		hasprofilepic = select('select hasprofilepic from users where username = "%s"'%profusr)[0][0]
 		if hasprofilepic in (1, '1'):
@@ -504,7 +504,7 @@ elif act == 'img':
 			sys.stdout.buffer.write(open('images/__implementation__default__%s.png'%(d['size']), 'rb').read())
 		exit(0)
 	else:
-		sys.stdout.buffer.write(b'Cache-control: max-age=1000000\n\n')
+		sys.stdout.buffer.write(b'Cache-control: max-age=1000000000\n\n')
 		p_t, p = select('select parent_t, parent from contents where img = "%s"'%d['img'])[0]
 		if p_t == 2 and int(p) not in belonging_groups:			
 			exit(0)
