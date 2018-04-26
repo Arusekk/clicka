@@ -177,6 +177,8 @@ int main() {
   for (unsigned int i = 0; i < cookies.size(); i += 2) {
     if (cookies[i] == "sid") {
       sid = cookies[i + 1];
+      if (sid[sid.size() - 1] == ';')
+        sid.resize(sid.size() - 2);
       break;
     }
   }
@@ -367,8 +369,7 @@ int main() {
 
   if (act == "mes") {
     if (z == "") {
-      std::string ql = "select do, count(czas) from messages where od = \"{}\" "
-                       "group by do order by count(czas) desc limit 1;";
+      std::string ql = "select do, count(czas) from messages where od = \"{}\" group by do order by count(czas) desc limit 1;";
       rpl(ql, 1, username);
       res = stmt->executeQuery(ql);
       while (res != NULL and res->next()) {

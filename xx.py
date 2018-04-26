@@ -264,9 +264,8 @@ if act == "publish_b":
 	exit(0)
 
 elif act == "view":
-	#nazwy_grup_l = select('select id, nazwa from groups')
-	#nazwy_grup = {str(x[0]): str(x[1]) for x in nazwy_grup_l}
-
+	#TUTAJ
+	#print('Status: 304 Not Modified')
 	print()
 	print(m['head'], m['body_o'])
 	for i in belonging_groups:
