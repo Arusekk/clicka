@@ -110,7 +110,7 @@ int main() {
     while (cookie.size() and cookie.substr(0, 4) != "sid=")
       cookie = cookie.substr(1);
     // cout << "\n" << cookie << "\n";
-    cookies = split(cookie, "= ");
+    cookies = split(cookie, "=;");
     for (auto a : cookies)
       escape(a);
   }
