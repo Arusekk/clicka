@@ -16,6 +16,7 @@ function check_if_new_messages()
 		if(data == '1\n')
 		{
 			reload_messages();
+			document.getElementById('e9').play();
 		}
 	});
 }
