@@ -339,35 +339,6 @@ int main() {
     return 0;
   }
 
-  if (act == "mes_b") {
-    std::string in;
-
-    while (std::cin >> in) {
-      content += in;
-      content += " ";
-    }
-    erase_first(content, "content=");
-    escape_html(content);
-    if (whitespace(content)) {
-      std::cout << "Location: xx.cgi?a=mes&z=" << z << "\n\n";
-      return 0;
-    }
-
-    std::string u =
-        "insert into messages values(0, \"{}\", \"{}\", \"{}\", now(), 0)";
-    std::string u2 =
-        "delete from messages where do not in (select username from users)";
-    rpl(u, 3, username, z, content);
-    try {
-      stmt->executeUpdate(u);
-      stmt->executeUpdate(u2);
-    } catch (std::exception &e) {
-      std::cerr << "\n" << e.what();
-    }
-    std::cout << "Location: xx.cgi?a=mes&z=" << z << "\n\n";
-    return 0;
-  }
-
   if (act == "publish") {
     std::cout << "\n"
               << M["head"] << M["body_o"] << listing_grup << "</div>"

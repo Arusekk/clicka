@@ -57,3 +57,9 @@ function comment_onclick(com)
 		com.value = "";
 }
 
+function enterpress(input)
+{
+	wiad = input.value
+	input.value = ''
+	jQuery.post('xx.py?a=mes_b&z='+z, {'content': wiad}, function(){reload_messages();})
+}

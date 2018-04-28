@@ -307,6 +307,11 @@ elif act == "invite_b":
 	print(m['head'], m['body_o'], "</div>", m['main_o']) #TODO: wypisz grupy
 	print('Wyślij zaproszonej osobie link do rejestracji:<br><h4>https://anx.nazwa.pl/xx.py?a=register&id={}</h4>'.format(link))
 
+elif act == 'mes_b':
+	if not set(d['content']) <= set('\n\t '):
+		select('insert into messages values(0, "{}", "{}", "{}", now(), 0)'.format(username, d['z'], d['content']))
+	print('Location: xx.cgi?a=mes&z=%s\n'%d['z'])
+
 elif act == 'anm': #are new messages
 	print()
 	last_mes_query = sel_list('select czas from last_mes_query where username="%s"'%username)[0]
