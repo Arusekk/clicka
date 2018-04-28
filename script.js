@@ -7,7 +7,17 @@ var z;
 
 function reload_messages()
 {
-	jQuery.get('http://localhost/xx.py?a=messages&z='+z, function(data) {$('#messages').html(data)});
+	jQuery.get('xx.py?a=messages&z='+z, function(data) {$('#messages').html(data)});
+}
+
+function check_if_new_messages()
+{
+	jQuery.get('xx.py?a=anm&z='+z, function(data){
+		if(data == '1\n')
+		{
+			reload_messages();
+		}
+	});
 }
 
 function main()
@@ -17,7 +27,7 @@ function main()
 	if($('#messages').length)
 	{	
 		reload_messages();
-		setInterval(function(){reload_messages();}, 15*1000)
+		setInterval(function(){check_if_new_messages();}, 15*1000)
 	}
 }
 
@@ -38,5 +48,11 @@ function like(parent_t, parent, v)
 		else
 			$("#" + parent + "_dl").html("<b>Ty to dezaprobujesz</b>");
 	});
+}
+
+function comment_onclick(com)
+{
+	if(com.value ==  " Napisz komentarz…")
+		com.value = "";
 }
 

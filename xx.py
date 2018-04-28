@@ -228,7 +228,7 @@ def postsbysql(query, where='a=view', display_from_open_groups = False):
 			print(' <b>{}</b> {}</span>'.format(imiona[i[0]], i[3]))
 
 		print('''<form action="xx.py?a=comment_b&w={}" method="post" autocomplete="off">
-			<input type="text" name="content" value=" Napisz komentarz…" class="itext" style="width: 100%" onclick="this.value =''" onfocusout="this.value=' Napisz komentarz…'">
+			<input type="text" name="content" value=" Napisz komentarz…" class="itext" style="width: 100%" onclick="comment_onclick(this)">
 		</form>'''.format(post_id))
 		print('</div>')		
 		print('</div>')
@@ -310,14 +310,25 @@ elif act == "invite_b":
 elif act == 'anm': #are new messages
 	print()
 	last_mes_query = sel_list('select czas from last_mes_query where username="%s"'%username)[0]
+	last_message_time = sel_list('''select czas from messages where 
+		((od = "{u}" and do = "{z}") or (od = "{z}" and do = "{u}")) order by czas desc limit 1'''.format(czas = int(last_mes_query.timestamp()),u = username, z = d['z']))[0]
+	if(last_mes_query < last_message_time):
+		print(1)
+	else:
+		print(0)
 
 elif act == 'messages':
 	print()
+	
+	last_mes_query = sel_list('select czas from last_mes_query where username="%s"'%username)[0]
+	dates_before_query = sel_list('''select count(id) from messages where 
+		((od = "{u}" and do = "{z}") or (od = "{z}" and do = "{u}")) and czas > from_unixtime({czas})'''.format(czas = int(last_mes_query.timestamp()),u = username, z = d['z']))[0]
 	try:
 		d['weeks']
 	except:
 		d['weeks'] = 12
-	
+	d['weeks'] = max(d['weeks'], dates_before_query)
+
 	messages = select('(select content, od, czas from messages where (od = "{u}" and do = "{z}") or (od = "{z}" and do = "{u}") order by czas desc limit {weeks}) order by czas asc'.format(weeks = d['weeks'], u = username, z = d['z']))
 	for mes in messages:
 		if mes[1] == username:
@@ -326,6 +337,9 @@ elif act == 'messages':
 			otag = m['almes_o']
 		otag = otag.replace('{time}', str(mes[2]))
 		print(otag, mes[0], '<br></span><br>')
+	
+	select('delete from last_mes_query where username = "{}"'.format(username))
+	select('insert into last_mes_query values ("{}", now())'.format(username))
 
 elif act == "groups":
 	print()
