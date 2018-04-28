@@ -3,10 +3,22 @@
 //if(scroll_down)
 	//$(function(){window.scrollTo(0,document.body.scrollHeight);});
 
+var z;
+
+function reload_messages()
+{
+	jQuery.get('http://localhost/xx.py?a=messages&z='+z, function(data) {$('#messages').html(data)});
+}
+
 function main()
 {
 	$(".comments").hide();
 	$('[lt3]').show();
+	if($('#messages').length)
+	{	
+		reload_messages();
+		setInterval(function(){reload_messages();}, 15*1000)
+	}
 }
 
 $(document).ready(main);

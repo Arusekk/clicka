@@ -147,11 +147,6 @@ for i in form:
 	v = v.replace("\\", "&#92;")
 	d[i] = v;
 
-try:
-	d['weeks']
-except:
-	d['weeks'] = 6
-
 cu.execute("select username, imie from users")
 res = cu.fetchall()
 imiona = {res[i][0]: res[i][1] for i in range(0, len(res))}
@@ -264,8 +259,6 @@ if act == "publish_b":
 	exit(0)
 
 elif act == "view":
-	#TUTAJ
-	#print('Status: 304 Not Modified')
 	print()
 	print(m['head'], m['body_o'])
 	for i in belonging_groups:
@@ -273,6 +266,11 @@ elif act == "view":
 	print("</div>", m['main_o'])
 
 	#postsbysql('select * from contents where datediff(now(), date) <= 7*{} order by date desc'.format(d['weeks']))
+
+	try:
+		d['weeks']
+	except:
+		d['weeks'] = 6
 	postsbysql('select * from contents order by date desc limit {}'.format(d['weeks']))
 
 elif act == "like_b":
@@ -308,6 +306,26 @@ elif act == "invite_b":
 	print()
 	print(m['head'], m['body_o'], "</div>", m['main_o']) #TODO: wypisz grupy
 	print('Wyślij zaproszonej osobie link do rejestracji:<br><h4>https://anx.nazwa.pl/xx.py?a=register&id={}</h4>'.format(link))
+
+elif act == 'anm': #are new messages
+	print()
+	last_mes_query = sel_list('select czas from last_mes_query where username="%s"'%username)[0]
+
+elif act == 'messages':
+	print()
+	try:
+		d['weeks']
+	except:
+		d['weeks'] = 12
+	
+	messages = select('(select content, od, czas from messages where (od = "{u}" and do = "{z}") or (od = "{z}" and do = "{u}") order by czas desc limit {weeks}) order by czas asc'.format(weeks = d['weeks'], u = username, z = d['z']))
+	for mes in messages:
+		if mes[1] == username:
+			otag = m['mymes_o']
+		else:
+			otag = m['almes_o']
+		otag = otag.replace('{time}', str(mes[2]))
+		print(otag, mes[0], '<br></span><br>')
 
 elif act == "groups":
 	print()

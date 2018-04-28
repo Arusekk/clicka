@@ -379,7 +379,7 @@ int main() {
 
     if (!weeks)
       weeks = 22;
-    std::cout << "\n" << M["head"] << M["body_o"] << std::endl;
+    std::cout << "\n" << M["head"] << M["body_o"] << "<script>z = \"" << z << "\"</script>" << std::endl;
 
     std::set<std::string> rozmowcy;
     try {
@@ -407,10 +407,11 @@ int main() {
     std::cout << "</div>" << M["main_o"] << std::endl;
     //
 
-    std::string q = "(select content, od, czas from messages where (od = \"{}\" and do = \"{}\") or (od = \"{}\" and do = \"{}\") order by czas desc limit {}) order by czas asc";
+    std::cout << "<span id=\"messages\">\n";
+
+    /*std::string q = "(select content, od, czas from messages where (od = \"{}\" and do = \"{}\") or (od = \"{}\" and do = \"{}\") order by czas desc limit {}) order by czas asc";
     rpl(q, 5, username, z, z, username, std::to_string(weeks));
     res = stmt->executeQuery(q);
-
     while (res != NULL and res->next()) {
       std::string otag;
       if (res->getString("od") == username)
@@ -422,12 +423,12 @@ int main() {
 
       std::cout << otag;
       std::cout << res->getString("content") << "<br></span><br>";
-    }
+    }*/
+
+    std::cout << "</span>\n";
 
     std::cout << rpl(M["mes_form"], 3, z, z, std::to_string(weeks + 100));
-    std::cout
-        << "<h3 style=\"color: red\">Wiadomości trzeba odświeżać. Wiem, to "
-           "głupie, naprawimy to kiedyś.</h3>";
+    std::cout << "<h3 style=\"color: red\">Wiadomości trzeba odświeżać. Wiem, to głupie, naprawimy to kiedyś.</h3>";
 
     std::string u = "delete from last_mes_query where username = \"{}\"";
     std::string u2 = "insert into last_mes_query values (\"{}\", now())";
