@@ -111,13 +111,13 @@ int main() {
       cookie = cookie.substr(1);
     // cout << "\n" << cookie << "\n";
     cookies = split(cookie, "=;");
-    for (auto a : cookies)
+    for (auto & a : cookies)
       escape(a);
   }
 
   if (get_str) {
     get = split(get_str, "=&");
-    for (auto a : get)
+    for (auto & a : get)
       escape(a);
   }
 
@@ -219,87 +219,11 @@ int main() {
   }
 
   if (!logged) {
-    if (act == "login_b") {
-      goto LOGIN_B;
-    } else {
-      if (act != "dump")
-        goto LOGIN;
-    }
+    goto LOGIN;
   }
-
+  
   if (act == "")
     act = "view";
-
-  /* if (act == "login_b") {
-  LOGIN_B:
-    std::string login, passwd;
-    bool ok = 0;
-
-    for (unsigned int i = 0; i < post.size(); i += 2) {
-      if (post[i] == "login")
-        login = post[i + 1];
-      if (post[i] == "passwd")
-        passwd = post[i + 1];
-    }
-
-    std::string bare = passwd;
-    passwd = sha256(passwd);
-
-    try {
-      std::string q = "select username, imie from users where passwd = \"{passwd}\" and username = \"{login}\"";
-      replace_all(q, "{passwd}", passwd);
-      replace_all(q, "{login}", login);
-      res = stmt->executeQuery(q);
-    } catch (sql::SQLException &e) {
-      std::cerr << "\nNastąpił błąd logowania\n";
-      return 0;
-    }
-
-    while (res->next()) {
-      if (res->getString("username") == login)
-        ok = 1;
-    }
-
-    if (!ok) {
-      std::cout << "\nPodano nieprawidłowy login lub hasło :(\n";
-      std::cout << "Podano: " << bare <<  "Jego sha256 wynosi: "  << passwd;
-      return 0;
-    }
-
-    char sid[130];
-    for (int i = 0; i < 128; i++) {
-      do
-        sid[i] = static_cast<char>(rnd(97, 122));
-      while (sid[i] == '"' or sid[i] == '=' or sid[i] == ';');
-    }
-    sid[128] = 0;
-
-    std::string u =
-        "insert into sessions values(\"{sid}\", \"{login}\", now(), 0)";
-    replace_all(u, "{sid}", sid);
-    replace_all(u, "{login}", login);
-    std::string u2 = "delete from sessions where username = \"{}\"";
-    u2 = rpl(u2, 1, login);
-
-    try {
-      stmt->executeUpdate(u2);
-      stmt->executeUpdate(u);
-    } catch (sql::SQLException &e) {
-      std::cout << "\n# ERR: SQLException in " << __FILE__;
-      std::cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << std::endl;
-      std::cout << "# ERR: " << e.what();
-      std::cout << " (MySQL error code: " << e.getErrorCode();
-      std::cout << ", SQLState: " << e.getSQLState() << " )" << std::endl;
-    }
-
-    std::cout << "Set-Cookie: sid=" << sid << "\n";
-    std::cout << "Location: xx.py?a=view\n";
-    std::cout << "\nCześć " + login + ", zalogowałeś się w serwisie\n"
-              << std::endl;
-
-    return 0;
-  }*/
-  LOGIN_B:
 
   if (act == "login") {
   LOGIN:
