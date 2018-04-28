@@ -10,7 +10,7 @@ form = cgi.FieldStorage();
 d = dict()
 try:
 	act = form["a"].value
-except:
+except KeyError:
 	act = 'view'
 
 db = pymysql.connect("localhost", "antek", open("/var/www/mysql_password").read()[:-1], "xx", charset="utf8")
@@ -60,11 +60,11 @@ except Exception as e:
 		exit(0)
 	username = None
 
-m = dict();
+m = {}
 fl = open("html").read().splitlines()
 
-for i in range(0, len(fl), 2):
-	m[fl[i]] = fl[i+1]
+for k, v in zip(fl[::2], fl[1::2]):
+	m[k] = v
 
 #m['head'] = m['head'].replace("{}", open("style.css").read())
 
@@ -132,8 +132,8 @@ for i in form:
 			db.commit()
 			exit(0)
 	try:
-		v = form[i].value;
-	except:
+		v = form[i].value
+	except KeyError:
 		print('\n\n', form[i])
 		exit(0)
 	#if i == 'pswd1' or i == 'pswd2' or i == 'passwd':
@@ -235,7 +235,7 @@ def postsbysql(query, where='a=view', display_from_open_groups = False):
 	print('<span id="bottom"></span>')
 	try:
 		print('<a href=xx.py?{}&weeks={}#bottom><h3>Pokaż starsze posty…</h3></a>'.format(where, int(d['weeks']) + 20	))
-	except: pass
+	except (KeyError, ValueError): pass
 
 if act == "publish_b":
 	if d['target'] == "group":
@@ -267,10 +267,7 @@ elif act == "view":
 
 	#postsbysql('select * from contents where datediff(now(), date) <= 7*{} order by date desc'.format(d['weeks']))
 
-	try:
-		d['weeks']
-	except:
-		d['weeks'] = 6
+	d.setdefault('weeks', 6)
 	postsbysql('select * from contents order by date desc limit {}'.format(d['weeks']))
 
 elif act == "like_b":
@@ -328,10 +325,7 @@ elif act == 'messages':
 	last_mes_query = sel_list('select czas from last_mes_query where username="%s"'%username)[0]
 	dates_before_query = sel_list('''select count(id) from messages where 
 		((od = "{u}" and do = "{z}") or (od = "{z}" and do = "{u}")) and czas > from_unixtime({czas})'''.format(czas = int(last_mes_query.timestamp()),u = username, z = d['z']))[0]
-	try:
-		d['weeks']
-	except:
-		d['weeks'] = 12
+	d.setdefault('weeks', 12)
 	d['weeks'] = max(d['weeks'], dates_before_query)
 
 	messages = select('(select content, od, czas from messages where (od = "{u}" and do = "{z}") or (od = "{z}" and do = "{u}") order by czas desc limit {weeks}) order by czas asc'.format(weeks = d['weeks'], u = username, z = d['z']))
@@ -412,7 +406,7 @@ elif act == "group_add":
 	try:
 		if d['return']== 'group':
 			print('Location: xx.py?a=group&id=%s\n'%d['groupid'])
-	except:
+	except KeyError:
 		print('Location: xx.py?a=panel&g=%s\n'%d['groupid'])
 
 elif act == "group_rem":
@@ -446,7 +440,7 @@ elif act == "register":
 	res = select('select count(whom) from invitations where link = "{}" and active = 1'.format(d['id']))
 	try:
 		1/int(res[0][0])
-	except:
+	except (IndexError, ZeroDivisionError):
 		print('Link do zaproszenia nie został rozpoznany albo jest już nieaktywny')
 		exit(0)
 
@@ -456,7 +450,7 @@ elif act == "register_b":
 	res = select('select count(whom) from invitations where link = "{}" and active = 1'.format(d['id']))
 	try:
 		1/int(res[0][0])
-	except:
+	except (IndexError, ZeroDivisionError):
 		print('\nLink do zaproszenia nie został rozpoznany albo jest już nieaktywny')
 		exit(0)
 	try:
@@ -474,11 +468,11 @@ elif act == "register_b":
 			print("\nNazwa jest już zajęta.")
 			exit(0)
 
-		if(d['pswd1'] != d['pswd2']):
+		if d['pswd1'] != d['pswd2']:
 			print("\nHasła się nie zgadzają.")
 			exit(0)
 
-		if(len(d['imie'].encode('utf-8'))) >= 300:
+		if len(d['imie'].encode('utf-8')) >= 300:
 			print("\nImię użytkownika jest zbyt długie")
 			exit(0)
 
@@ -510,10 +504,7 @@ elif act == 'create_group_b':
 		print("\nNazwa jest już zajęta :(")
 		exit(0)
 
-	try:
-		d['opis']
-	except KeyError:
-		d['opis'] = ''
+	d.setdefault('opis', '')
 
 	select('insert into groups values(0, "%s", %d, "%s", 0, "%s")'%(d['nazwa'], int(d['typ']), d['opis'], username))
 	groupid = sel_list('select id from groups where nazwa = "%s"'%d['nazwa'])[0]
@@ -532,8 +523,8 @@ elif act == 'img':
 	if str.startswith(d['img'], '_profile_'):
 		sys.stdout.buffer.write(b'Cache-control: max-age=604800\n\n')
 		profusr = d['img'].replace('_profile_', '')
-		hasprofilepic = select('select hasprofilepic from users where username = "%s"'%profusr)[0][0]
-		if hasprofilepic in (1, '1'):
+		hasprofilepic = int(select('select hasprofilepic from users where username = "%s"'%profusr)[0][0])
+		if hasprofilepic == 1:
 			sys.stdout.buffer.write(open('images/%s__%s.png'%(profusr, d['size']), 'rb').read())
 		else:
 			#sys.stdout.buffer.write(open('images/__implementation__default.png', 'rb').read())
@@ -559,7 +550,7 @@ elif act == "login_b":
 	s = select('select username, imie from users where username="%s" and passwd="%s"'%(login, hashed))
 	try:
 		username = s[0][0]
-	except:
+	except IndexError:
 		print('\nNieprawidłowy login lub hasło :(')
 		exit()
 
