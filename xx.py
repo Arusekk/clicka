@@ -571,6 +571,68 @@ elif act == "login_b":
 	print('Location: xx.py?a=view\n')
 	print("Ok")
 
+elif act == "chess":
+	#print('Content-type: text/plain')
+	print()
+	print('<script src="jquery.js"></script>')
+	print('<script src="script.js"></script>')
+	print('<script>id = %s</script>'%d['id'])
+
+	import chess, chess.svg
+	start_fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+	fen, last_move = select('select stan, last_move from chess where id=%s'%d['id'])[0]
+	bcq = select('select biale, czarne from chess where id=%s'%d['id'])[0]
+	if (bcq[0] == username):
+		user_color = True
+		opponent = bcq[1] 
+	else:
+		user_color = False
+		opponent = bcq[0]
+
+	b = chess.Board(fen=fen)
+	
+	if(b.is_check()):
+		checked_king = b.king(b.turn)
+		is_check = True
+	else:
+		is_check = False
+		checked_king = None
+
+	print('<h2><img src="xx.py?a=img&img=_profile_%s&size=medium">   %s</h2>'%(opponent, imiona[opponent]))
+	print(chess.svg.board(b, size=400, lastmove=chess.Move.from_uci(last_move), check=checked_king, flipped=not user_color))
+	print('<h2><img src="xx.py?a=img&img=_profile_%s&size=medium">   %s</h2>'%(username, imiona[username]))
+
+elif act == "chess_b":
+	import chess
+
+	q,w,e,r = d['move']
+	move = ''.join([w,q,r,e])
+	fen = select('select stan from chess where id=%s'%d['id'])[0][0]
+	bcq = select('select biale, czarne from chess where id=%s'%d['id'])[0]
+	if (bcq[0] == username):
+		user_color = True
+		opponent = bcq[1] 
+	else:
+		user_color = False
+		opponent = bcq[0]
+
+	b = chess.Board(fen=fen)
+	move = chess.Move.from_uci(move)
+
+	if(user_color != b.turn):
+		print('Location: xx.py?a=chess&id=%s\n'%d['id'])
+		exit()
+
+	if move in b.legal_moves:
+		b.push(move)
+		select('update chess set stan = "%s", last_move="%s" where id=%s'%(b.fen(), move, d['id']))
+	else:
+		#print('\n<h1>Nie jest to dozwolony ruch!</h1>')
+		pass
+
+	print('Location: xx.py?a=chess&id=%s'%d['id'])
+	print()
+
 else:
 	print('\n', m['nieznany_act'])
 

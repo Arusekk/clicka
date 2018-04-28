@@ -3,7 +3,8 @@
 //if(scroll_down)
 	//$(function(){window.scrollTo(0,document.body.scrollHeight);});
 
-var z;
+var z, id;
+var zaz_pol = 0;
 
 function reload_messages()
 {
@@ -30,6 +31,27 @@ function main()
 		reload_messages();
 		setInterval(function(){check_if_new_messages();}, 15*1000)
 	}
+	$('rect').click(function()
+		{
+			klasa = $(this).attr("class");
+			pole = klasa[klasa.length - 1] + klasa[klasa.length - 2];
+
+			if(zaz_pol == 0)
+			{
+				zaz_pol = pole;
+			}
+			else
+			{
+				/* jQuery.post('xx.py?a=chess_b&id='+id, {'move': zaz_pol+pole}, function () {
+				 	location.reload();
+				 });*/
+				//alert(zaz_pol + pole);
+				window.location ='xx.py?a=chess_b&move='+ zaz_pol + pole +'&id='+ id;
+				zaz_pol = 0;
+
+			}
+
+		});
 }
 
 $(document).ready(main);
