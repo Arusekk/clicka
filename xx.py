@@ -633,6 +633,25 @@ elif act == "chess_b":
 	print('Location: xx.py?a=chess&id=%s'%d['id'])
 	print()
 
+#VARIA:
+
+elif act == "stats":
+	print()
+	print('<title>Statystyki</title><body style="text-align: center; background-color: #dcd2b6"><img src="h.png"><h1>Statystyki Clicki</h1>')
+	visitors_today = sel_list('select count(distinct username) from activities where cast(date as date) = curdate()')[0]
+	posts_today = sel_list('select count(id) from contents where cast(czas as date) = curdate()')[0]
+	comments_today = sel_list('select count(date) from comments where cast(date as date) = curdate()')[0]
+	messages_today = sel_list('select count(id) from messages where cast(czas as date) = curdate()')[0]
+	by_mes = select('select od, count(id) from messages group by od')
+
+	print('<h4>Clickę odwiedziło dzisiaj %s, którzy napisali %s postów, %s komentarzy i %s wiadomości.</h4>'%(visitors_today, posts_today, comments_today, messages_today))
+	print('<h3>Użytkownicy wg napisanych wiadomości:</h3>')
+	print('<table style="border: solid 1px black">')
+	for i in by_mes:
+		print('<tr><td>', imiona[i[0]], '</td><td>', i[1], '</td></tr>')
+	print('</table>')	
+	print('</body>')
+
 else:
 	print('\n', m['nieznany_act'])
 
