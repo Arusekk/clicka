@@ -266,7 +266,6 @@ elif act == "view":
 	print("</div>", m['main_o'])
 
 	#postsbysql('select * from contents where datediff(now(), date) <= 7*{} order by date desc'.format(d['weeks']))
-
 	d.setdefault('weeks', 6)
 	postsbysql('select * from contents order by date desc limit {}'.format(d['weeks']))
 
@@ -374,7 +373,6 @@ elif act == "group":
 		print('<h3>Jesteś administratorem tej grupy. <a href="xx.py?a=panel&g=%s"><u>Zarządzaj członkami.</u></a></h3>'%d['id'])
 	if group_type in (1, '1') and int(d['id']) not in belonging_groups:
 		print('<h3>Nie należysz do tej otwartej grupy. <a href="xx.py?a=group_add&groupid=%s&whom=%s&return=group"><u>Dołącz do grupy</u></a></h3>'%(d['id'], username))
-
 	postsbysql('select * from contents where parent_t = 2 and parent = "{}" order by date desc'.format(d['id']), where='a=group&id=%s'%d['id'], display_from_open_groups = True)
 
 elif act == "panel":
@@ -431,9 +429,8 @@ elif act == 'space':
 		exit(0)
 
 	print('<div style="display: block"><img style="float: none" src="xx.py?a=img&img=_profile_%s&size=large"><h1>%s</h1><br></div>'%(uid, imiona[uid]))
-	
+	d.setdefault('weeks', 6)
 	postsbysql('select * from contents where parent_t = 1 and parent = "%s" order by date desc limit %s'%(uid, d['weeks']), where='a=space&user=%s'%uid)
-	#...
 
 elif act == "register":
 	print()
