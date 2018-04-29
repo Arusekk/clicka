@@ -642,10 +642,10 @@ elif act == "stats":
 	posts_today = sel_list('select count(id) from contents where cast(czas as date) = curdate()')[0]
 	comments_today = sel_list('select count(date) from comments where cast(date as date) = curdate()')[0]
 	messages_today = sel_list('select count(id) from messages where cast(czas as date) = curdate()')[0]
-	by_mes = select('select od, count(id) from messages group by od')
+	by_mes = select('select od, count(id) from messages group by od order by count(id) desc')
 
-	print('<h4>Clickę odwiedziło dzisiaj %s, którzy napisali %s postów, %s komentarzy i %s wiadomości.</h4>'%(visitors_today, posts_today, comments_today, messages_today))
-	print('<h3>Użytkownicy wg napisanych wiadomości:</h3>')
+	print('<h4>Clickę odwiedziło dzisiaj %s użytkowników, którzy napisali %s postów, %s komentarzy i %s wiadomości.</h4>'%(visitors_today, posts_today, comments_today, messages_today))
+	print('<h3>Użytkownicy wg wysłanych wiadomości:</h3>')
 	print('<table style="border: solid 1px black">')
 	for i in by_mes:
 		print('<tr><td>', imiona[i[0]], '</td><td>', i[1], '</td></tr>')
