@@ -55,8 +55,6 @@ try:
 except Exception as e:
 	if act not in ('register', 'register_b', 'login_b'):
 		print("Location: xx.cgi\n")
-		print(e)
-		print(sid)
 		exit(0)
 	username = None
 
@@ -574,20 +572,28 @@ elif act == "login_b":
 elif act == "chess":
 	#print('Content-type: text/plain')
 	print()
-	print('<script src="jquery.js"></script>')
-	print('<script src="script.js"></script>')
+	#print('<script src="jquery.js"></script>')
+	#print('<script src="script.js"></script>')
+	print(m['head'], m['body_o'], '</div>', m['main_o'], m['audio_tap'])
 	print('<script>id = %s</script>'%d['id'])
 
 	import chess, chess.svg
 	start_fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
-	fen, last_move = select('select stan, last_move from chess where id=%s'%d['id'])[0]
+	fen, last_move, result = select('select stan, last_move, wynik from chess where id=%s'%d['id'])[0]
+	if last_move == None or len(last_move) < 4:
+		last_move = '0000'
 	bcq = select('select biale, czarne from chess where id=%s'%d['id'])[0]
 	if (bcq[0] == username):
 		user_color = True
 		opponent = bcq[1] 
-	else:
+	elif (bcq[1] == username):
 		user_color = False
 		opponent = bcq[0]
+	elif public:
+		usercolor = 'spectator'
+	else:
+		print('\n<h1>Ta gra nie jest publiczna</h1>')
+		exit()
 
 	b = chess.Board(fen=fen)
 	
@@ -598,59 +604,109 @@ elif act == "chess":
 		is_check = False
 		checked_king = None
 
-	print('<h2><img src="xx.py?a=img&img=_profile_%s&size=medium">   %s</h2>'%(opponent, imiona[opponent]))
-	print(chess.svg.board(b, size=400, lastmove=chess.Move.from_uci(last_move), check=checked_king, flipped=not user_color))
-	print('<h2><img src="xx.py?a=img&img=_profile_%s&size=medium">   %s</h2>'%(username, imiona[username]))
+	flipped = not	user_color
+	svg = chess.svg.board(b, size=450, lastmove=chess.Move.from_uci(last_move), check=checked_king, flipped=flipped, coordinates=not not not True)
+	rects = ''
+	if not flipped:
+		for row, y in zip(range(8, 0, -1), range(0, 360, 45)):
+			for col, x in zip(list('abcdefgh'), range(0, 360, 45)):
+				rects += '<rect id="{id}" height="45" fill="green" opacity="0" width="45" x="{x}" y="{y}" onclick="zaznacz_pole(this.id);"/>'.format(id=col + str(row), x=x, y=y)
+	if flipped:
+		for row, y in zip(range(1, 9), range(0, 360, 45)):
+			for col, x in zip(list('hgfedcba'), range(0, 360, 45)):
+				rects += '<rect id="{id}" height="45" fill="green" opacity="0" width="45" x="{x}" y="{y}" onclick="zaznacz_pole(this.id);"/>'.format(id=col + str(row), x=x, y=y)
+	svg = svg[:-6] + rects + svg[-5:]
+	#przyda się potem
+
+	if(result == 1):
+		print('<h1 style="margin: 0">Zwyciężyły <span style="color: white">białe</span></h1>')
+	elif(result == -1):
+		print('<h1 style="margin: 0">Zwyciężyły <span style="color: black">czarne</span></h1>')
+	elif is_check:
+		print('<h1 style="color: red">Szach</h1>')
+	if user_color == b.turn:
+		print('<h1>Jest twoja kolej.</h1>')
+	else:
+		print('<h1>Jest kolej przeciwnika.</h1>')
+
+	print('<h2><img src="xx.py?a=img&img=_profile_%s&size=medium" style="float: none">   %s</h2>'%(opponent, imiona[opponent]))
+	print(svg)
+	print('<h2><img src="xx.py?a=img&img=_profile_%s&size=medium" style="float: none">   %s</h2>'%(username, imiona[username]))
+	print(m['chess_form'].replace('{id}', d['id']))
+
+	#print(chess.svg.piece(chess.BaseBoard(board_fen=b.board_fen()).piece_at(chess.C1), size=20))
+	#można dodać wyświetlanie zbitych bierek
 
 elif act == "chess_b":
 	import chess
 
-	q,w,e,r = d['move']
-	move = ''.join([w,q,r,e])
-	fen = select('select stan from chess where id=%s'%d['id'])[0][0]
+	move_s = d['from'] + d['to']
+	fen, history, result, public = select('select stan, history, wynik, public from chess where id=%s'%d['id'])[0]
 	bcq = select('select biale, czarne from chess where id=%s'%d['id'])[0]
 	if (bcq[0] == username):
 		user_color = True
 		opponent = bcq[1] 
-	else:
+	elif bcq[1] == username:
 		user_color = False
 		opponent = bcq[0]
 
 	b = chess.Board(fen=fen)
-	move = chess.Move.from_uci(move)
+	#move = chess.Move(chess.square(int(d['from'][0]), int(d['from'][1])), chess.square(int(d['to'][0]), int(d['to'][1])), promotion=chess.QUEEN)
+	move = chess.Move.from_uci(move_s)
+	movep = chess.Move.from_uci(move_s + 'q')
 
-	if(user_color != b.turn):
-		print('Location: xx.py?a=chess&id=%s\n'%d['id'])
+	if(b.result() != '*'):
+		print('\nTa gra jest już zakończona.')
+		print(b.result())
 		exit()
 
+	if(user_color != b.turn):
+		print('\n<h1>Nie jest twoja kolej.</h1><a href="xx.py?a=chess&id=%s">Powrót</a>'%d['id'])
+		exit()
+
+	if movep in b.legal_moves:
+		move = movep
 	if move in b.legal_moves:
+		if type(history) == type(None):
+			history = ''
+		history = history + str(b.san(move)) + ' '
 		b.push(move)
-		select('update chess set stan = "%s", last_move="%s" where id=%s'%(b.fen(), move, d['id']))
+		select('update chess set stan = "%s", last_move="%s", history="%s" where id=%s'%(b.fen(), move, history, d['id']))
+		if(b.result() != '*'):
+			print("\n", b.result())
+			if(b.result() == '1-0'):
+				select('update chess set wynik = %d where id=%s'%(1, d['id']))
+			elif(b.result() == '0-1'):
+				select('update chess set wynik = %d where id=%s'%(-1, d['id']))
+			print()
 	else:
-		#print('\n<h1>Nie jest to dozwolony ruch!</h1>')
-		pass
+		print()
+		if(b.is_into_check(move) or b.is_into_check(movep)):
+			print('<h1>Ten ruch umieści twojego króla w szachu.</h1>')
+		print('<h1>Ten ruch nie jest dozwolony</h1><a href="xx.py?a=chess&id=%s">Powrót</a>'%d['id'])
+		exit()
 
 	print('Location: xx.py?a=chess&id=%s'%d['id'])
 	print()
 
 #VARIA:
 
-elif act == "stats":
-	print()
-	print('<title>Statystyki</title><body style="text-align: center; background-color: #dcd2b6"><img src="h.png"><h1>Statystyki Clicki</h1>')
-	visitors_today = sel_list('select count(distinct username) from activities where cast(date as date) = curdate()')[0]
-	posts_today = sel_list('select count(id) from contents where cast(czas as date) = curdate()')[0]
-	comments_today = sel_list('select count(date) from comments where cast(date as date) = curdate()')[0]
-	messages_today = sel_list('select count(id) from messages where cast(czas as date) = curdate()')[0]
-	by_mes = select('select od, count(id) from messages group by od')
+# elif act == "stats":
+# 	print()
+# 	print('<title>Statystyki</title><body style="text-align: center; background-color: #dcd2b6"><img src="h.png"><h1>Statystyki Clicki</h1>')
+# 	visitors_today = sel_list('select count(distinct username) from activities where cast(date as date) = curdate()')[0]
+# 	posts_today = sel_list('select count(id) from contents where cast(czas as date) = curdate()')[0]
+# 	comments_today = sel_list('select count(date) from comments where cast(date as date) = curdate()')[0]
+# 	messages_today = sel_list('select count(id) from messages where cast(czas as date) = curdate()')[0]
+# 	by_mes = select('select od, count(id) from messages group by od')
 
-	print('<h4>Clickę odwiedziło dzisiaj %s, którzy napisali %s postów, %s komentarzy i %s wiadomości.</h4>'%(visitors_today, posts_today, comments_today, messages_today))
-	print('<h3>Użytkownicy wg napisanych wiadomości:</h3>')
-	print('<table style="border: solid 1px black">')
-	for i in by_mes:
-		print('<tr><td>', imiona[i[0]], '</td><td>', i[1], '</td></tr>')
-	print('</table>')	
-	print('</body>')
+# 	print('<h4>Clickę odwiedziło dzisiaj %s, którzy napisali %s postów, %s komentarzy i %s wiadomości.</h4>'%(visitors_today, posts_today, comments_today, messages_today))
+# 	print('<h3>Użytkownicy wg napisanych wiadomości:</h3>')
+# 	print('<table style="border: solid 1px black">')
+# 	for i in by_mes:
+# 		print('<tr><td>', imiona[i[0]], '</td><td>', i[1], '</td></tr>')
+# 	print('</table>')	
+# 	print('</body>')
 
 else:
 	print('\n', m['nieznany_act'])

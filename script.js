@@ -22,6 +22,20 @@ function check_if_new_messages()
 	});
 }
 
+function zaznacz_pole(pole)
+{
+	if (zaz_pol)
+	{
+		window.location = 'xx.py?a=chess_b&from='+zaz_pol+'&to='+pole + '&id=' + id;
+	}
+	else
+	{
+		zaz_pol = pole;
+		document.getElementById(pole).setAttribute('opacity', 0.2);
+		document.getElementById('tap').play();
+	}
+}
+
 function main()
 {
 	$(".comments").hide();
@@ -31,27 +45,6 @@ function main()
 		reload_messages();
 		setInterval(function(){check_if_new_messages();}, 15*1000)
 	}
-	$('rect').click(function()
-		{
-			klasa = $(this).attr("class");
-			pole = klasa[klasa.length - 1] + klasa[klasa.length - 2];
-
-			if(zaz_pol == 0)
-			{
-				zaz_pol = pole;
-			}
-			else
-			{
-				/* jQuery.post('xx.py?a=chess_b&id='+id, {'move': zaz_pol+pole}, function () {
-				 	location.reload();
-				 });*/
-				//alert(zaz_pol + pole);
-				window.location ='xx.py?a=chess_b&move='+ zaz_pol + pole +'&id='+ id;
-				zaz_pol = 0;
-
-			}
-
-		});
 }
 
 $(document).ready(main);
