@@ -708,6 +708,7 @@ elif act == "chess_b":
 # 	print('</table>')	
 # 	print('</body>')
 
+
 else:
 	print('\n', m['nieznany_act'])
 
