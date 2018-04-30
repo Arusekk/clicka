@@ -345,11 +345,11 @@ elif act == "groups":
 	for i in belonging_groups:
 		print(m['entryp_o'].replace('{}', 'group&id={}'.format(i)), nazwy_grup[str(i)],'</a></div>')
 	print("</div>", m['main_o'])
-	print('<h3><a href=\"xx.py?a=create_group\"><u>Stwórz</u></a> własną grupę</h3>')
+	print('<h3><a href="xx.py?a=create_group"><u>Stwórz</u></a> własną grupę</h3>')
 
 	for i in select('select * from groups where typ != 2'):
 		print('<a href="xx.py?a=group&id=%s">'%i[0], m['enum_o'], i[1], '<br>')
-		print('<span class="desc">', i[3], '</span>') 	
+		print('<span class="desc">', i[3], '</span><br><span class="desc">Admin: %s</span>'%imiona[i[5]]) 	
 		if int(i[2]) == 1:
 			print(m['group_o_img'])
 		else:
