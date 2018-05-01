@@ -335,6 +335,7 @@ int main() {
     std::cout << "</span>\n";
 
     std::cout << rpl(M["mes_form"], 3, z, z, std::to_string(weeks + 100));
+    std::cout << M["audios"] << "\n";
     std::cout << "<h3 style=\"color: green\">Wiadomości odświeżają się same.</h3>";
 
     return 0;

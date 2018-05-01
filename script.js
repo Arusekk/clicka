@@ -5,6 +5,7 @@
 
 var z, id;
 var zaz_pol = 0;
+var focus = 1;
 
 function reload_messages()
 {
@@ -20,6 +21,29 @@ function check_if_new_messages()
 			document.getElementById('e9').play();
 		}
 	});
+}
+
+function check_if_new_moves()
+{
+		jQuery.get('xx.py?a=anm_chess&gameid='+id, function(data){
+		if(data == '1\n')
+		{
+			if(focus == 0)
+			{
+					document.getElementById('e9').play();
+					document.getElementById('e9').onended = function () {location.reload();}
+					document.getElementsByTagName('svg')[0].innerHTML = ""
+					document.getElementsByTagName('h1')[0].innerHTML = "Ładowanie…"
+			}
+			else
+			{
+				location.reload();
+			}
+
+		}
+		//else
+			//alert(data)
+	});	
 }
 
 function zaznacz_pole(pole)
@@ -40,10 +64,16 @@ function main()
 {
 	$(".comments").hide();
 	$('[lt3]').show();
+	window.onfocus = function () {focus = 1;}
+	window.onblur = function () {focus = 0;}
 	if($('#messages').length)
 	{	
 		reload_messages();
 		setInterval(function(){check_if_new_messages();}, 15*1000)
+	}
+	if($('svg').length)
+	{
+		setInterval(function(){check_if_new_moves();}, 20*1000)
 	}
 }
 

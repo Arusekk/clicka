@@ -324,10 +324,29 @@ elif act == 'mes_b':
 
 elif act == 'anm': #are new messages
 	print()
-	last_mes_query = sel_list('select czas from last_mes_query where username="%s"'%username)[0]
-	last_message_time = sel_list('''select czas from messages where 
+	try:
+		last_mes_query = sel_list('select czas from last_mes_query where username="%s"'%username)[0]
+		last_message_time = sel_list('''select czas from messages where 
 		((od = "{u}" and do = "{z}") or (od = "{z}" and do = "{u}")) order by czas desc limit 1'''.format(czas = int(last_mes_query.timestamp()),u = username, z = d['z']))[0]
+	except (IndexError, KeyError):
+		print(1)
+		exit()
+
 	if(last_mes_query < last_message_time):
+		print(1)
+	else:
+		print(0)
+
+elif act == "anm_chess": #are new moves
+	print()
+	try:
+		last_chess_query = sel_list('select czas from last_chess_query where username="%s" and game_id=%s'%(username, d['gameid']))[0]
+		last_move_time = sel_list('select last_move_t from chess where id=%s'%d['gameid'])[0]
+	except (IndexError, KeyError):
+		print(1)
+		exit()
+
+	if(last_chess_query < last_move_time):
 		print(1)
 	else:
 		print(0)
@@ -585,8 +604,10 @@ elif act == "login_b":
 elif act == "chess":
 	# print('Content-type: text/plain')
 	print()
-	print(m['head'], m['body_o'], '</div>', m['main_o'], m['audio_tap'])
+	print(m['head'], m['body_o'], '</div>', m['main_o'], m['audios'])
 	print('<script>id = %s</script>'%d['id'])
+	select('delete from last_chess_query where  username = "%s" and game_id=%s'%(username, d['id']))
+	select('insert into last_chess_query set czas = now(), username = "%s", game_id=%s'%(username, d['id']))
 
 	import chess, chess.svg
 	start_fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
@@ -629,8 +650,12 @@ elif act == "chess":
 
 	if(result == 1):
 		print('<h1 style="margin: 0">Zwyciężył(a) <span style="color: white">%s</span></h1>' % (imiona[username] if user_color else imiona[opponent]))
+		if not b.is_game_over():
+			print('<h2>Przeciwnik zrezygnował.</h2>')
 	elif(result == -1):
 		print('<h1 style="margin: 0">Zwyciężył(a) <span style="color: black">%s</span></h1>' % (imiona[username] if not user_color else imiona[opponent]))
+		if not b.is_game_over():
+			print('<h2>Przeciwnik zrezygnował.</h2>')
 	elif is_check:
 		print('<h1 style="color: red">Szach</h1>')
 	if user_color == b.turn and not result:
@@ -648,8 +673,7 @@ elif act == "chess":
 elif act == "chess_b":
 	import chess
 
-	move_s = d['from'] + d['to']
-	fen, history, result, public = select('select stan, history, wynik, public from chess where id=%s'%d['id'])[0]
+	fen, history, result, public = select('select stan, history, wynik, public from chess where id=%s and (biale="%s" or czarne="%s")'%(d['id'], username, username))[0]
 	bcq = select('select biale, czarne from chess where id=%s'%d['id'])[0]
 	if (bcq[0] == username):
 		user_color = True
@@ -657,7 +681,18 @@ elif act == "chess_b":
 	elif bcq[1] == username:
 		user_color = False
 		opponent = bcq[0]
+	else:
+		exit()
 
+	#rezygnowanie:
+	if "r" in d.keys() and d['r'] == 'resign':
+		select('update chess set wynik="{w}" where id={id}'.format(w=(1 if user_color else -1), id=d['id']))
+		db.commit()
+		print('\nLocation: xx.py?a=mygames')
+		exit()
+	#
+
+	move_s = d['from'] + d['to']
 	b = chess.Board(fen=fen)
 	#move = chess.Move(chess.square(int(d['from'][0]), int(d['from'][1])), chess.square(int(d['to'][0]), int(d['to'][1])), promotion=chess.QUEEN)
 	move = chess.Move.from_uci(move_s)
@@ -709,7 +744,7 @@ elif act == "challenge_b":
 		print('\n', m['head'], m['body_o'], '</div>', m['main_o'], '<h1>Zaproszono użytkownika do gry</h1></div>')
 	elif 'id' in d.keys():
 		if d['resp'] == 'accept':
-			select('update chess set parent="challenge_accepted_%s" where id=%s'%(username, d['id']))
+			select('update chess set parent="challenge_accepted_%s", start_time = now() where id=%s'%(username, d['id']))
 			print('Location: xx.py?a=chess&id=%s\n'%d['id'])
 		elif d['resp'] == 'decline':
 			select('delete from chess where id=%s'%d['id'])
@@ -717,6 +752,38 @@ elif act == "challenge_b":
 	else:
 		print()
 		print(d)
+
+elif act == "mygames":
+	print()
+	print(m['head'], m['body_o'], '</div>', m['main_o'])
+	print('<h1>Twoje gry:</h1>')
+	mygames = select('select id, biale, czarne, wynik, turn, history from chess where biale="{u}" or czarne="{u}" order by start_time desc'.format(u=username))
+	sorted(mygames, key=lambda x: 0 if x[3] == 0 else 1)
+	for g in mygames:
+		opponent = (g[1] if g[1] != username else g[2])
+		if g[3] == 0:
+			stan = '<span style="color: red">Trwająca</span>'
+		elif g[3] == 1:
+			stan = '<span style="color: green">Wygrana</span>'
+		elif g[3] == 12:
+			stan = 'Zremisowana'
+		else:
+			stan = '<span style="color: blue">Przegrana</span>'
+		print('<h3><a href="xx.py?a=chess&id=%s">'%g[0], stan, ' gra z ', imiona[opponent], '</a>')
+		if not g[3]:
+			print('<a href="xx.py?a=chess_b&r=resign&id={id}">[zrezygnuj]</a>'.format(id=g[0]))
+		print('<a href="xx.py?a=game_history&id={id}">[pokaż historię]</a></h3>'.format(id=g[0]))
+
+elif act == "game_history":
+	print()
+	game = select('select biale, czarne, history from chess where id={id} and (biale="{u}" or czarne="{u}")'.format(u=username, id=d['id']))
+	if not len(game):
+		print('<h1>Ta gra nie jest publiczna i nie jesteś jej członkiem albo ta gra w ogóle nie istnieje.</h1>')
+		exit()
+	print('Biale:', game[0][0], '<br>')
+	print('Czarne:', game[0][1], '<br>')
+	for i in game[0][2].split():
+		print(i, '<br>')
 
 #VARIA:
 
