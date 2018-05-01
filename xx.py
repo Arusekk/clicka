@@ -168,7 +168,7 @@ def postsbysql(query, where='a=view', display_from_open_groups = False):
 			break;
 	#
 	#wyzwania szachy:
-	challenges = select('select id, biale, czarne from chess where (biale="{u}" or czarne="{u}") and parent="propo"'.format(u=username))
+	challenges = select('select id, biale, czarne from chess where (biale="{u}" or czarne="{u}") and parent="propo" and proponent!="{u}"'.format(u=username))
 	for c in challenges:
 		proponent = (c[1] if c[1] != username else c[2])
 		print('<h2 style="color: red">{p} proponuje ci grę w szachy ♔♘. <a href="xx.py?a=challenge_b&resp=accept&id={id}" style="color: green; text-decoration: underline" target="_blank">Przyjmij</a> albo też <a href="xx.py?a=challenge_b&resp=decline&id={id}" style="color: orange; text-decoration: underline">odrzuć</a></h2>'.format(p=imiona[proponent], id=c[0]))
@@ -746,7 +746,7 @@ elif act == "mygames":
 	print()
 	print(m['head'], m['body_o'], '</div>', m['main_o'])
 	print('<h1>Twoje gry:</h1>')
-	mygames = select('select id, biale, czarne, wynik, turn, history from chess where biale="{u}" or czarne="{u}" order by start_time desc'.format(u=username))
+	mygames = select('select id, biale, czarne, wynik, turn, history from chess where (biale="{u}" or czarne="{u}") and parent!="propo" order by start_time desc'.format(u=username))
 	sorted(mygames, key=lambda x: 0 if x[3] == 0 else 1)
 	for g in mygames:
 		opponent = (g[1] if g[1] != username else g[2])
