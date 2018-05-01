@@ -764,15 +764,19 @@ elif act == "mygames":
 		print('<a href="xx.py?a=game_history&id={id}">[pokaż historię]</a></h3>'.format(id=g[0]))
 
 elif act == "game_history":
+	import chess, chess.svg
 	print()
 	game = select('select biale, czarne, history from chess where id={id} and (biale="{u}" or czarne="{u}")'.format(u=username, id=d['id']))
 	if not len(game):
 		print('<h1>Ta gra nie jest publiczna i nie jesteś jej członkiem albo ta gra w ogóle nie istnieje.</h1>')
 		exit()
-	print('Biale:', game[0][0], '<br>')
-	print('Czarne:', game[0][1], '<br>')
+	print('Biale:', imiona[game[0][0]], '<br>')
+	print('Czarne:', imiona[game[0][1]], '<br>')
+	b = chess.Board()
 	for i in game[0][2].split():
 		print(i, '<br>')
+		b.push(b.push_san(i))
+		print(chess.svg.board(b, size=200), '<br>')
 
 #VARIA:
 
