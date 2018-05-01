@@ -167,6 +167,18 @@ def postsbysql(query, where='a=view', display_from_open_groups = False):
 		else:
 			break;
 	#
+	#wyzwania szachy:
+	challenges = select('select id, biale, czarne from chess where (biale="{u}" or czarne="{u}") and parent="propo"'.format(u=username))
+	for c in challenges:
+		proponent = (c[1] if c[1] != username else c[2])
+		print('<h2 style="color: red">{p} proponuje ci grę w szachy ♔♘. <a href="xx.py?a=challenge_b&resp=accept&id={id}" style="color: green; text-decoration: underline" target="_blank">Przyjmij</a> albo też <a href="xx.py?a=challenge_b&resp=decline&id={id}" style="color: orange; text-decoration: underline">odrzuć</a></h2>'.format(p=imiona[proponent], id=c[0]))
+	#
+	#otwarte gry szachy:
+	gry = select('select id, biale, czarne from chess where (biale="{u}" or czarne="{u}") and parent!="propo" and wynik=0 and turn="{u}"'.format(u=username))
+	for g in gry:
+		opponent = (g[1] if g[1] != username else g[2])
+		print('<h2 style="color: red">Jest twój ruch w grze z <a href="xx.py?a=chess&id=%s" target="_blank"><u>%s</u></a></h2>'%(g[0], imiona[opponent]))
+	#
 
 	for i in select(query):
 		a = str(i[4])
@@ -232,7 +244,7 @@ def postsbysql(query, where='a=view', display_from_open_groups = False):
 		print('</div>')
 	print('<span id="bottom"></span>')
 	try:
-		print('<a href=xx.py?{}&weeks={}#bottom><h3>Pokaż starsze posty…</h3></a>'.format(where, int(d['weeks']) + 20	))
+		print('<a href=xx.py?{}&weeks={}#bottom><h3>Pokaż starsze posty…</h3></a>'.format(where, int(d['weeks']) + 10 ))
 	except: pass
 
 if act == "publish_b":
@@ -356,7 +368,7 @@ elif act == "groups":
 		print('<a href="xx.py?a=group&id=%s">'%i[0], m['enum_o'], i[1], '<br>')
 		print('<span class="desc">', i[3], '</span>') 	
 		if int(i[2]) == 1:
-			print(m['group_o_img'])
+			print(m['groupp_o_img'])
 		else:
 			print(m['group_c_img'].replace('{}', imiona[i[5]]))
 		
@@ -379,7 +391,8 @@ elif act == "group":
 	if group_type in (1, '1') and int(d['id']) not in belonging_groups:
 		print('<h3>Nie należysz do tej otwartej grupy. <a href="xx.py?a=group_add&groupid=%s&whom=%s&return=group"><u>Dołącz do grupy</u></a></h3>'%(d['id'], username))
 
-	postsbysql('select * from contents where parent_t = 2 and parent = "{}" order by date desc'.format(d['id']), where='a=group&id=%s'%d['id'], display_from_open_groups = True)
+	d.setdefault('weeks', 6)
+	postsbysql('select * from contents where parent_t = 2 and parent = "{}" order by date desc limit {}'.format(d['id'], d['weeks']), where='a=group&id=%s'%d['id'], display_from_open_groups = True)
 
 elif act == "panel":
 	group_admin = sel_list('select admin from groups where id=%s'%d['g'])[0]
@@ -570,18 +583,14 @@ elif act == "login_b":
 	print("Ok")
 
 elif act == "chess":
-	#print('Content-type: text/plain')
+	# print('Content-type: text/plain')
 	print()
-	#print('<script src="jquery.js"></script>')
-	#print('<script src="script.js"></script>')
 	print(m['head'], m['body_o'], '</div>', m['main_o'], m['audio_tap'])
 	print('<script>id = %s</script>'%d['id'])
 
 	import chess, chess.svg
 	start_fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 	fen, last_move, result = select('select stan, last_move, wynik from chess where id=%s'%d['id'])[0]
-	if last_move == None or len(last_move) < 4:
-		last_move = '0000'
 	bcq = select('select biale, czarne from chess where id=%s'%d['id'])[0]
 	if (bcq[0] == username):
 		user_color = True
@@ -610,29 +619,28 @@ elif act == "chess":
 	if not flipped:
 		for row, y in zip(range(8, 0, -1), range(0, 360, 45)):
 			for col, x in zip(list('abcdefgh'), range(0, 360, 45)):
-				rects += '<rect id="{id}" height="45" fill="green" opacity="0" width="45" x="{x}" y="{y}" onclick="zaznacz_pole(this.id);"/>'.format(id=col + str(row), x=x, y=y)
+				rects += '<rect id="{id}" height="45" fill="red" opacity="0" width="45" x="{x}" y="{y}" onclick="zaznacz_pole(this.id);"/>'.format(id=col + str(row), x=x, y=y)
 	if flipped:
 		for row, y in zip(range(1, 9), range(0, 360, 45)):
 			for col, x in zip(list('hgfedcba'), range(0, 360, 45)):
-				rects += '<rect id="{id}" height="45" fill="green" opacity="0" width="45" x="{x}" y="{y}" onclick="zaznacz_pole(this.id);"/>'.format(id=col + str(row), x=x, y=y)
+				rects += '<rect id="{id}" height="45" fill="red" opacity="0" width="45" x="{x}" y="{y}" onclick="zaznacz_pole(this.id);"/>'.format(id=col + str(row), x=x, y=y)
 	svg = svg[:-6] + rects + svg[-5:]
 	#przyda się potem
 
 	if(result == 1):
-		print('<h1 style="margin: 0">Zwyciężyły <span style="color: white">białe</span></h1>')
+		print('<h1 style="margin: 0">Zwyciężył(a) <span style="color: white">%s</span></h1>' % (imiona[username] if user_color else imiona[opponent]))
 	elif(result == -1):
-		print('<h1 style="margin: 0">Zwyciężyły <span style="color: black">czarne</span></h1>')
+		print('<h1 style="margin: 0">Zwyciężył(a) <span style="color: black">%s</span></h1>' % (imiona[username] if not user_color else imiona[opponent]))
 	elif is_check:
 		print('<h1 style="color: red">Szach</h1>')
-	if user_color == b.turn:
+	if user_color == b.turn and not result:
 		print('<h1>Jest twoja kolej.</h1>')
-	else:
+	elif not result:
 		print('<h1>Jest kolej przeciwnika.</h1>')
 
 	print('<h2><img src="xx.py?a=img&img=_profile_%s&size=medium" style="float: none">   %s</h2>'%(opponent, imiona[opponent]))
 	print(svg)
 	print('<h2><img src="xx.py?a=img&img=_profile_%s&size=medium" style="float: none">   %s</h2>'%(username, imiona[username]))
-	print(m['chess_form'].replace('{id}', d['id']))
 
 	#print(chess.svg.piece(chess.BaseBoard(board_fen=b.board_fen()).piece_at(chess.C1), size=20))
 	#można dodać wyświetlanie zbitych bierek
@@ -671,9 +679,11 @@ elif act == "chess_b":
 			history = ''
 		history = history + str(b.san(move)) + ' '
 		b.push(move)
-		select('update chess set stan = "%s", last_move="%s", history="%s" where id=%s'%(b.fen(), move, history, d['id']))
+		turn = (bcq[0] if b.turn else bcq[1])
+		# print('\n', turn)
+		select('update chess set stan = "%s", last_move="%s", history="%s", turn="%s", last_move_t = now() where id=%s'%(b.fen(), move, history, turn, d['id']))
 		if(b.result() != '*'):
-			print("\n", b.result())
+			#print("\n", b.result())
 			if(b.result() == '1-0'):
 				select('update chess set wynik = %d where id=%s'%(1, d['id']))
 			elif(b.result() == '0-1'):
@@ -688,6 +698,25 @@ elif act == "chess_b":
 
 	print('Location: xx.py?a=chess&id=%s'%d['id'])
 	print()
+
+elif act == "challenge_b":
+	if 'whom' in d.keys():
+		import random
+		biale, czarne = username, d['whom']
+		if random.randint(0, 1):
+			biale, czarne = czarne, biale
+		select('insert into chess set biale = "%s", czarne = "%s", parent="propo" '%(biale, czarne))
+		print('\n', m['head'], m['body_o'], '</div>', m['main_o'], '<h1>Zaproszono użytkownika do gry</h1></div>')
+	elif 'id' in d.keys():
+		if d['resp'] == 'accept':
+			select('update chess set parent="challenge_accepted_%s" where id=%s'%(username, d['id']))
+			print('Location: xx.py?a=chess&id=%s\n'%d['id'])
+		elif d['resp'] == 'decline':
+			select('delete from chess where id=%s'%d['id'])
+			print('Location: xx.py?a=view\n')
+	else:
+		print()
+		print(d)
 
 #VARIA:
 

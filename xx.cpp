@@ -281,9 +281,10 @@ int main() {
       rpl(tg, 1, res->getString("username"));
       std::string tmp =
           "<br><a href=\"xx.cgi?a=mes&z={}\"><button>Wiadomość</button></a><a "
-          "href=\"xx.py?a=space&user={}\"><button>Przestrzeń</button></a></"
+          "href=\"xx.py?a=space&user={}\"><button>Przestrzeń</button></a><a "
+          "href=\"xx.py?a=challenge_b&whom={}\"><button>Zaproponuj szachy</button></a></"
           "div><br>";
-      rpl(tmp, 2, res->getString("username"), res->getString("username"));
+      rpl(tmp, 3, res->getString("username"), res->getString("username"), res->getString("username"));
 
       std::cout << M["enum_o"] << tg << res->getString("imie") << tmp;
     }
@@ -384,52 +385,6 @@ int main() {
     std::cout << form;
     return 0;
   }
-
-  // if(act == "groups")
-  // {
-  //   cout << "\n" << M["head"] << M["body_o"] << listing_grup << "</div>" <<
-  //   M["main_o"] << "<h1>Grupy:</h1>"; cout << "<h3><a
-  //   href=\"xx.py?a=create_group\"><u>Stwórz</u></a> własną grupę</h3>" <<
-  //   endl; std::string q = "select * from groups where typ != 2"; res =
-  //   stmt->executeQuery(q);
-
-  //   while(res != NULL and res->next())
-  //   {
-  //     cout << M["enum_o"] << res->getString("nazwa") << "<br>" << "<span
-  //     class=\"desc\">" << res->getString("opis") << "</span>";
-  //     //#TODO: obrazek grupy
-  //     if(res->getInt("typ") == 1)
-  //       cout << M["group_o_img"];
-  //     else
-  //     {
-  //       cout << srpl(M["group_c_img"], 1,
-  //       imiona[res->getString("admin")]);
-  //     }
-  //     cout << "</div><br>" << endl;
-  //   }
-
-  //   return 0;
-  // }
-
-  /*if (act == "dump") {
-    std::string ip = "90.156.16.110";
-    char *addr = getenv("REMOTE_ADDR");
-    if (addr == NULL) {
-      std::cout << "Nie udało się określić adresu ip" << std::endl;
-      return 0;
-    }
-
-    if (ip == std::string(addr)) {
-      std::cout << "Content-type: text/plain; charset=utf-8\n\n";
-      std::cout << file("log") << std::endl;
-    } else {
-      std::cout << "\n\n" << std::endl;
-      std::cout << addr << std::endl;
-      std::cout << "<h1>Brak uprawnień. Incydent zostanie zgłoszony</h1>"
-                << std::endl;
-    }
-    return 0;
-  }*/
 
   std::cout << "\n" << M["nieznany_act"];
   return 0;
