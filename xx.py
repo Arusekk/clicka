@@ -380,7 +380,7 @@ elif act == "groups":
 		print('<a href="xx.py?a=group&id=%s">'%i[0], m['enum_o'], i[1], '<br>')
 		print('<span class="desc">', i[3], '</span><br><span class="desc">Admin: %s</span>'%imiona[i[5]]) 	
 		if int(i[2]) == 1:
-			print(m['groupp_o_img'])
+			print(m['group_o_img'])
 		else:
 			print(m['group_c_img'].replace('{}', imiona[i[5]]))
 		
@@ -677,7 +677,7 @@ elif act == "chess_b":
 	if "r" in d.keys() and d['r'] == 'resign':
 		select('update chess set wynik="{w}" where id={id}'.format(w=(1 if user_color else -1), id=d['id']))
 		db.commit()
-		print('\nLocation: xx.py?a=mygames')
+		print('Location: xx.py?a=mygames\n')
 		exit()
 	#
 
@@ -729,7 +729,7 @@ elif act == "challenge_b":
 		biale, czarne = username, d['whom']
 		if random.randint(0, 1):
 			biale, czarne = czarne, biale
-		select('insert into chess set biale = "%s", czarne = "%s", parent="propo" '%(biale, czarne))
+		select('insert into chess set biale = "%s", czarne = "%s", proponent="%s", parent="propo" '%(biale, czarne, username))
 		print('\n', m['head'], m['body_o'], '</div>', m['main_o'], '<h1>Zaproszono użytkownika do gry</h1></div>')
 	elif 'id' in d.keys():
 		if d['resp'] == 'accept':
@@ -747,7 +747,7 @@ elif act == "mygames":
 	print(m['head'], m['body_o'], '</div>', m['main_o'])
 	print('<h1>Twoje gry:</h1>')
 	mygames = select('select id, biale, czarne, wynik, turn, history from chess where (biale="{u}" or czarne="{u}") and parent!="propo" order by start_time desc'.format(u=username))
-	sorted(mygames, key=lambda x: 0 if x[3] == 0 else 1)
+	mygames = sorted(mygames, key=lambda x: 0 if x[3] == 0 else 1)
 	for g in mygames:
 		opponent = (g[1] if g[1] != username else g[2])
 		if g[3] == 0:
