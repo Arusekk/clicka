@@ -712,7 +712,6 @@ elif act == "chess_b":
 				select('update chess set wynik = %d where id=%s'%(1, d['id']))
 			elif(b.result() == '0-1'):
 				select('update chess set wynik = %d where id=%s'%(-1, d['id']))
-			print()
 	else:
 		print()
 		if(b.is_into_check(move) or b.is_into_check(movep)):
