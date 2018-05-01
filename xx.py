@@ -774,7 +774,7 @@ elif act == "game_history":
 	b = chess.Board()
 	for i in game[0][2].split():
 		print(i, '<br>')
-		b.push(b.push_san(i))
+		b.push_san(i)
 		print(chess.svg.board(b, size=200), '<br>')
 
 #VARIA:
