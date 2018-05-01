@@ -244,13 +244,8 @@ def postsbysql(query, where='a=view', display_from_open_groups = False):
 		print('</div>')
 	print('<span id="bottom"></span>')
 	try:
-<<<<<<< HEAD
-		print('<a href=xx.py?{}&weeks={}#bottom><h3>Pokaż starsze posty…</h3></a>'.format(where, int(d['weeks']) + 20	))
-	except (KeyError, ValueError): pass
-=======
 		print('<a href=xx.py?{}&weeks={}#bottom><h3>Pokaż starsze posty…</h3></a>'.format(where, int(d['weeks']) + 10 ))
 	except: pass
->>>>>>> chess
 
 if act == "publish_b":
 	if d['target'] == "group":
@@ -407,13 +402,9 @@ elif act == "group":
 		print('<h3>Jesteś administratorem tej grupy. <a href="xx.py?a=panel&g=%s"><u>Zarządzaj członkami.</u></a></h3>'%d['id'])
 	if group_type in (1, '1') and int(d['id']) not in belonging_groups:
 		print('<h3>Nie należysz do tej otwartej grupy. <a href="xx.py?a=group_add&groupid=%s&whom=%s&return=group"><u>Dołącz do grupy</u></a></h3>'%(d['id'], username))
-<<<<<<< HEAD
-	postsbysql('select * from contents where parent_t = 2 and parent = "{}" order by date desc'.format(d['id']), where='a=group&id=%s'%d['id'], display_from_open_groups = True)
-=======
 
 	d.setdefault('weeks', 6)
 	postsbysql('select * from contents where parent_t = 2 and parent = "{}" order by date desc limit {}'.format(d['id'], d['weeks']), where='a=group&id=%s'%d['id'], display_from_open_groups = True)
->>>>>>> chess
 
 elif act == "panel":
 	group_admin = sel_list('select admin from groups where id=%s'%d['g'])[0]
