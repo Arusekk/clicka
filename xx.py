@@ -174,10 +174,11 @@ def postsbysql(query, where='a=view', display_from_open_groups = False):
 		print('<h2 style="color: red">{p} proponuje ci grę w szachy ♔♘. <a href="xx.py?a=challenge_b&resp=accept&id={id}" style="color: green; text-decoration: underline" target="_blank">Przyjmij</a> albo też <a href="xx.py?a=challenge_b&resp=decline&id={id}" style="color: orange; text-decoration: underline">odrzuć</a></h2>'.format(p=imiona[proponent], id=c[0]))
 	#
 	#otwarte gry szachy:
-	gry = select('select id, biale, czarne from chess where (biale="{u}" or czarne="{u}") and parent!="propo" and wynik=0 and turn="{u}"'.format(u=username))
+	gry = select('select id, biale, czarne, parent from chess where (biale="{u}" or czarne="{u}") and parent!="propo" and wynik=0 and turn="{u}"'.format(u=username))
 	for g in gry:
 		opponent = (g[1] if g[1] != username else g[2])
-		print('<h2 style="color: red">Jest twój ruch w grze z <a href="xx.py?a=chess&id=%s" target="_blank"><u>%s</u></a></h2>'%(g[0], imiona[opponent]))
+		occasion = (' w ramach ' + g[3] + ' ' if g[3] != 'challenge_accepted' else '') 
+		print('<h2 style="color: red">Jest twój ruch w grze z <a href="xx.py?a=chess&id=%s" target="_blank"><u>%s</u></a>%s</h2>'%(g[0], imiona[opponent], occasion))
 	#
 
 	for i in select(query):
@@ -734,7 +735,7 @@ elif act == "challenge_b":
 		print('\n', m['head'], m['body_o'], '</div>', m['main_o'], '<h1>Zaproszono użytkownika do gry</h1></div>')
 	elif 'id' in d.keys():
 		if d['resp'] == 'accept':
-			select('update chess set parent="challenge_accepted_%s", start_time = now() where id=%s'%(username, d['id']))
+			select('update chess set parent="challenge_accepted", start_time = now() where id=%s'%(d['id']))
 			print('Location: xx.py?a=chess&id=%s\n'%d['id'])
 		elif d['resp'] == 'decline':
 			select('delete from chess where id=%s'%d['id'])
@@ -747,8 +748,8 @@ elif act == "mygames":
 	print()
 	print(m['head'], m['body_o'], '</div>', m['main_o'])
 	print('<h1>Twoje gry:</h1>')
-	mygames = select('select id, biale, czarne, wynik, turn, history from chess where (biale="{u}" or czarne="{u}") and parent!="propo" order by start_time desc'.format(u=username))
-	mygames = sorted(mygames, key=lambda x: 0 if x[3] == 0 else 1)
+	mygames = select('select id, biale, czarne, wynik, turn, history, parent from chess where (biale="{u}" or czarne="{u}") and parent!="propo" order by start_time desc'.format(u=username))
+	mygames = sorted(mygames, key=lambda x: 0 if x[3] == 0 or x[6] != 'challenge_accepted' else 1)
 	for g in mygames:
 		opponent = (g[1] if g[1] != username else g[2])
 		user_color = (1 if g[1] == username else -1)
@@ -759,6 +760,8 @@ elif act == "mygames":
 		else:
 			stan = '<span style="color: blue">Przegrana</span>'
 		print('<h3><a href="xx.py?a=chess&id=%s">'%g[0], stan, ' gra z ', imiona[opponent], '</a>')
+		if g[6] != 'challenge_accepted':
+			print(' w ramach', g[6])
 		if not g[3]:
 			print('<a href="xx.py?a=chess_b&r=resign&id={id}">[zrezygnuj]</a>'.format(id=g[0]))
 		print('<a href="xx.py?a=game_history&id={id}">[pokaż historię]</a></h3>'.format(id=g[0]))
