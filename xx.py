@@ -749,12 +749,11 @@ elif act == "mygames":
 	mygames = sorted(mygames, key=lambda x: 0 if x[3] == 0 else 1)
 	for g in mygames:
 		opponent = (g[1] if g[1] != username else g[2])
+		user_color = (1 if g[1] == username else -1)
 		if g[3] == 0:
 			stan = '<span style="color: red">Trwająca</span>'
-		elif g[3] == 1:
+		elif g[3] == user_color:
 			stan = '<span style="color: green">Wygrana</span>'
-		elif g[3] == 12:
-			stan = 'Zremisowana'
 		else:
 			stan = '<span style="color: blue">Przegrana</span>'
 		print('<h3><a href="xx.py?a=chess&id=%s">'%g[0], stan, ' gra z ', imiona[opponent], '</a>')
