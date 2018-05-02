@@ -223,13 +223,15 @@ def postsbysql(query, where='a=view', display_from_open_groups = False):
 
 		#komentarze:
 		comments = select('select * from comments where parent=%d'%post_id)
-		comments_count = sel_list('select count(*) from comments where parent=%d'%post_id)[0]
-		print('''<div class="commentsbox" onclick="show_comments({})">Pokaż komentarze ({})</div>'''.format(post_id, comments_count))
+		#comments_count = sel_list('select count(*) from comments where parent=%d'%post_id)[0]
+		print('''<div class="commentsbox" onclick="show_comments({})">Napisz komentarz</div>'''.format(post_id))
 		
-		if(int(comments_count) in range(1, 4)):
-			print('<div class="comments" id="c{}" lt3>'.format(post_id))
-		else:
-			print('<div class="comments" id="c{}">'.format(post_id))
+		# if(int(comments_count) in range(1, 4)):
+		# 	print('<div class="comments" id="c{}" lt3>'.format(post_id))
+		# else:
+		# 	print('<div class="comments" id="c{}">'.format(post_id))
+
+		print('<div class="comments" id="c{}">'.format(post_id))
 
 		for n, i in enumerate(comments):
 			if n:
@@ -237,9 +239,9 @@ def postsbysql(query, where='a=view', display_from_open_groups = False):
 			print('<span class="comment"><img src="xx.py?a=img&img=_profile_{}&size=small">'.format(i[0]))
 			print(' <b>{}</b> {}</span>'.format(imiona[i[0]], i[3]))
 
-		print('''<form action="xx.py?a=comment_b&w={}" method="post" autocomplete="off">
+		print('''<form action="xx.py?a=comment_b&w={post_id}" method="post" autocomplete="off" id="c_f_{post_id}">
 			<input type="text" name="content" value=" Napisz komentarz…" class="itext" style="width: 100%" onclick="comment_onclick(this)">
-		</form>'''.format(post_id))
+		</form>'''.format(post_id=post_id))
 		print('</div>')		
 		print('</div>')
 	print('<span id="bottom"></span>')

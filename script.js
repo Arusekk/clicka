@@ -62,7 +62,8 @@ function zaznacz_pole(pole)
 
 function main()
 {
-	$(".comments").hide();
+	//$(".comments").hide();
+	$("form").hide();
 	$('[lt3]').show();
 	window.onfocus = function () {focus = 1;}
 	window.onblur = function () {focus = 0;}
@@ -81,7 +82,7 @@ $(document).ready(main);
 
 function show_comments(s)
 {
-	$("#c"+s).toggle();
+	$("#c_f_"+s).toggle();
 }
 
 var el;
