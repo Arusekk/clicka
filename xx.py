@@ -239,7 +239,7 @@ def postsbysql(query, where='a=view', display_from_open_groups = False):
 			print('<span class="comment"><img src="xx.py?a=img&img=_profile_{}&size=small">'.format(i[0]))
 			print(' <b>{}</b> {}</span>'.format(imiona[i[0]], i[3]))
 
-		print('''<form action="xx.py?a=comment_b&w={post_id}" method="post" autocomplete="off" id="c_f_{post_id}">
+		print('''<form action="xx.py?a=comment_b&w={post_id}" method="post" autocomplete="off" class="comment_form" id="c_f_{post_id}">
 			<input type="text" name="content" value=" Napisz komentarz…" class="itext" style="width: 100%" onclick="comment_onclick(this)">
 		</form>'''.format(post_id=post_id))
 		print('</div>')		
