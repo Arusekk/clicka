@@ -603,7 +603,7 @@ elif act == "chess":
 
 	import chess, chess.svg
 	start_fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
-	fen, last_move, result = select('select stan, last_move, wynik from chess where id=%s'%d['id'])[0]
+	fen, last_move, result, time_limit, biale_t, czarne_t, last_move_t = select('select stan, last_move, wynik, time_limit, biale_t, czarne_t, last_move_t from chess where id=%s'%d['id'])[0]
 	bcq = select('select biale, czarne from chess where id=%s'%d['id'])[0]
 	if (bcq[0] == username):
 		user_color = True
@@ -638,34 +638,54 @@ elif act == "chess":
 			for col, x in zip(list('hgfedcba'), range(0, 360, 45)):
 				rects += '<rect id="{id}" height="45" fill="red" opacity="0" width="45" x="{x}" y="{y}" onclick="zaznacz_pole(this.id);"/>'.format(id=col + str(row), x=x, y=y)
 	svg = svg[:-6] + rects + svg[-5:]
-	#przyda się potem
 
 	if(result == 1):
 		print('<h1 style="margin: 0">Zwyciężył(a) <span style="color: white">%s</span></h1>' % (imiona[username] if user_color else imiona[opponent]))
 		if not b.is_game_over():
-			print('<h2>Przeciwnik zrezygnował.</h2>')
+			print('<h2>Gracz zrezygnował</h2>')
+			if time_limit:
+				print('<h2>albo przekroczył czas gry</h2>')
 	elif(result == -1):
 		print('<h1 style="margin: 0">Zwyciężył(a) <span style="color: black">%s</span></h1>' % (imiona[username] if not user_color else imiona[opponent]))
 		if not b.is_game_over():
-			print('<h2>Przeciwnik zrezygnował.</h2>')
+			print('<h2>Gracz zrezygnował</h2>')
+			if time_limit:
+				print('<h2>albo przekroczył czas gry</h2>')
 	elif is_check:
 		print('<h1 style="color: red">Szach</h1>')
 	if user_color == b.turn and not result:
-		print('<h1>Jest twoja kolej.</h1>')
+		print('<h2>Jest twoja kolej.</h2>')
 	elif not result:
-		print('<h1>Jest kolej przeciwnika.</h1>')
+		print('<h2>Jest kolej przeciwnika.</h2>')
 
-	print('<h2><img src="xx.py?a=img&img=_profile_%s&size=medium" style="float: none">   %s</h2>'%(opponent, imiona[opponent]))
+	# wyświetlanie zegarów:
+	if time_limit and biale_t > 0 and czarne_t > 0:
+		import datetime, time
+		now = datetime.datetime.fromtimestamp(time.time())
+		elapsed = int((now - last_move_t).total_seconds())
+		if b.turn:
+			biale_t -= elapsed
+		else:
+			czarne_t -= elapsed
+		biale_timer = '[' + str(datetime.timedelta(seconds = biale_t)).replace('days', 'dni') + ']'
+		czarne_timer = '[' +  str(datetime.timedelta(seconds = czarne_t)).replace('days', 'dni') + ']'
+		upper_t, lower_t = biale_timer, czarne_timer
+		if user_color:
+			upper_t, lower_t = lower_t, upper_t
+	else:
+		upper_t = lower_t = ''
+
+	print('<h2><img src="xx.py?a=img&img=_profile_%s&size=medium" style="float: none">   %s %s</h2>'%(opponent, imiona[opponent], upper_t))
 	print(svg)
-	print('<h2><img src="xx.py?a=img&img=_profile_%s&size=medium" style="float: none">   %s</h2>'%(username, imiona[username]))
+	print('<h2><img src="xx.py?a=img&img=_profile_%s&size=medium" style="float: none">   %s %s</h2>'%(username, imiona[username], lower_t))
 
-	#print(chess.svg.piece(chess.BaseBoard(board_fen=b.board_fen()).piece_at(chess.C1), size=20))
+	#print(chess.svg.piece(chess.BaseBoard(board_f0en=b.board_fen()).piece_at(chess.C1), size=20))
 	#można dodać wyświetlanie zbitych bierek
 
 elif act == "chess_b":
 	import chess
 
-	fen, history, result, public = select('select stan, history, wynik, public from chess where id=%s and (biale="%s" or czarne="%s")'%(d['id'], username, username))[0]
+	fen, history, result, public, biale_t, czarne_t, time_limit, last_move_t = select('select stan, history, wynik, public, biale_t, czarne_t, time_limit, last_move_t from chess where id=%s and (biale="%s" or czarne="%s")'%(d['id'], username, username))[0]
 	bcq = select('select biale, czarne from chess where id=%s'%d['id'])[0]
 	if (bcq[0] == username):
 		user_color = True
@@ -678,7 +698,7 @@ elif act == "chess_b":
 
 	#rezygnowanie:
 	if "r" in d.keys() and d['r'] == 'resign':
-		select('update chess set wynik="{w}" where id={id}'.format(w=(1 if user_color else -1), id=d['id']))
+		select('update chess set wynik="{w}" where id={id}'.format(w=(-1 if user_color else 1), id=d['id']))
 		db.commit()
 		print('Location: xx.py?a=mygames\n')
 		exit()
@@ -698,6 +718,24 @@ elif act == "chess_b":
 	if(user_color != b.turn):
 		print('\n<h1>Nie jest twoja kolej.</h1><a href="xx.py?a=chess&id=%s">Powrót</a>'%d['id'])
 		exit()
+
+	#czas w grach zegarowych 
+	if time_limit:
+		import datetime, time
+		now = datetime.datetime.fromtimestamp(time.time())
+		elapsed = int((now - last_move_t).total_seconds())
+		if b.turn:
+			select('update chess set biale_t = %d where id=%s'%(biale_t - elapsed, d['id']))
+			if biale_t - elapsed <= 0:
+				select('update chess set wynik = -1 where id=%s'%d['id'])
+				print('Location: xx.py?a=chess&id=%s\n'%d['id'])
+				exit()
+		else:
+			select('update chess set czarne_t = %d where id=%s'%(czarne_t - elapsed, d['id']))
+			if czarne_t - elapsed <= 0:
+				select('update chess set wynik = 1 where id=%s'%d['id'])
+				print('Location: xx.py?a=chess&id=%s\n'%d['id'])
+				exit()
 
 	if movep in b.legal_moves:
 		move = movep
