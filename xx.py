@@ -757,6 +757,8 @@ elif act == "mygames":
 			stan = '<span style="color: red">Trwająca</span>'
 		elif g[3] == user_color:
 			stan = '<span style="color: green">Wygrana</span>'
+		elif g[3] == 12:
+			stan = 'Zremisowana'
 		else:
 			stan = '<span style="color: blue">Przegrana</span>'
 		print('<h3><a href="xx.py?a=chess&id=%s">'%g[0], stan, ' gra z ', imiona[opponent], '</a>')
