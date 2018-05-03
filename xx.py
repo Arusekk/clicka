@@ -663,6 +663,9 @@ elif act == "chess":
 		import datetime, time
 		now = datetime.datetime.fromtimestamp(time.time())
 		elapsed = int((now - last_move_t).total_seconds())
+		if(last_move_t > now):
+			print('Ta gra rozpocznie się o {}'.format(str(last_move_t)))
+			exit()
 		if b.turn:
 			biale_t -= elapsed
 		else:
@@ -724,6 +727,9 @@ elif act == "chess_b":
 		import datetime, time
 		now = datetime.datetime.fromtimestamp(time.time())
 		elapsed = int((now - last_move_t).total_seconds())
+		if last_move_t > now:
+			print('\n<h1>Ta gra rozpoczyna się {}'.format(str(last_move_t)))
+			exit()
 		if b.turn:
 			select('update chess set biale_t = %d where id=%s'%(biale_t - elapsed, d['id']))
 			if biale_t - elapsed <= 0:
@@ -745,7 +751,6 @@ elif act == "chess_b":
 		history = history + str(b.san(move)) + ' '
 		b.push(move)
 		turn = (bcq[0] if b.turn else bcq[1])
-		# print('\n', turn)
 		select('update chess set stan = "%s", last_move="%s", history="%s", turn="%s", last_move_t = now() where id=%s'%(b.fen(), move, history, turn, d['id']))
 		if(b.result() != '*'):
 			#print("\n", b.result())
