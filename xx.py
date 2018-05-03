@@ -690,7 +690,7 @@ elif act == "chess_b":
 	move = chess.Move.from_uci(move_s)
 	movep = chess.Move.from_uci(move_s + 'q')
 
-	if(b.result() != '*'):
+	if(b.result() != '*' or result != 0):
 		print('\nTa gra jest już zakończona.')
 		print(b.result())
 		exit()
