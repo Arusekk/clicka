@@ -352,7 +352,7 @@ elif act == 'messages':
 	print()
 	try:
 		unseen = sel_one('select unseen from seen where od="{}" and do="{}"'.format(d['z'], username))
-	except IndexError:
+	except (IndexError):
 		unseen = 0
 	d.setdefault('weeks', 12)
 	d['weeks'] = max(d['weeks'], unseen)
@@ -368,6 +368,20 @@ elif act == 'messages':
 
 	select('update seen set unseen = 0 where od="{}" and do="{}"'.format(d['z'], username))
 
+elif act == "mes":
+	print()
+	d.setdefault('z', sel_one('select do from messages where od = "{}" group by do order by count(czas) desc limit 1;'.format(username)))
+	
+	print(m['head'], m['body_o'], '<script>z = "{}"</script>'.format(d['z']))
+	rozmowcy = sel_list('select od from messages where do="{u}" group by od order by max(czas) limit 10'.format(u=username))
+	for r in rozmowcy:
+		print(m['entryp_o'].replace('{}', 'mes&z=' + r), imiona[r], '</div></a>')
+
+	print('</div>', m['main_o'])
+	print('<span id="messages">\n</span>')
+
+	print(m['mes_form'], m['audios'])
+	print("<h3 style=\"color: green\">Wiadomości odświeżają się same.</h3>")
 	
 elif act == "groups":
 	print()

@@ -292,55 +292,6 @@ int main() {
     return 0;
   }
 
-  if (act == "mes") {
-    if (z == "") {
-      std::string ql = "select do, count(czas) from messages where od = \"{}\" group by do order by count(czas) desc limit 1;";
-      rpl(ql, 1, username);
-      res = stmt->executeQuery(ql);
-      while (res != NULL and res->next()) {
-        z = res->getString("do");
-      }
-    }
-
-    if (!weeks)
-      weeks = 22;
-    std::cout << "\n" << M["head"] << M["body_o"] << "<script>z = \"" << z << "\"</script>" << std::endl;
-
-    std::set<std::string> rozmowcy;
-    try {
-      std::string q = "select distinct od from messages where do = \"{}\"";
-      rpl(q, 1, username);
-      res = stmt->executeQuery(q);
-      while (res != NULL and res->next())
-        rozmowcy.insert(res->getString("od"));
-      q = "select distinct do from messages where od = \"{}\"";
-      rpl(q, 1, username);
-      res = stmt->executeQuery(q);
-      while (res != NULL and res->next())
-        rozmowcy.insert(res->getString("do"));
-    } catch (std::exception &e) {
-      std::cout << "\n" << e.what() << std::endl;
-    }
-
-    for (auto a : rozmowcy) {
-      std::string o = M["entry_o"];
-      std::cout << rpl(o, 1, std::string("mes&z=") + a) << imiona[a]
-                << "</div></a>"
-                << "\n";
-    }
-    std::cout << "</div>" << M["main_o"] << std::endl;
-    //
-
-    std::cout << "<span id=\"messages\">\n";
-    std::cout << "</span>\n";
-
-    std::cout << rpl(M["mes_form"], 3, z, z, std::to_string(weeks + 100));
-    std::cout << M["audios"] << "\n";
-    std::cout << "<h3 style=\"color: green\">Wiadomości odświeżają się same.</h3>";
-
-    return 0;
-  }
-
   if (act == "publish") {
     std::cout << "\n"
               << M["head"] << M["body_o"] << listing_grup << "</div>"
