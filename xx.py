@@ -350,8 +350,10 @@ elif act == "anm_chess": #are new moves
 
 elif act == 'messages':
 	print()
-
-	unseen = sel_one('select unseen from seen where od="{}" and do="{}"'.format(d['z'], username))
+	try:
+		unseen = sel_one('select unseen from seen where od="{}" and do="{}"'.format(d['z'], username))
+	except IndexError:
+		unseen = 0
 	d.setdefault('weeks', 12)
 	d['weeks'] = max(d['weeks'], unseen)
 
