@@ -159,7 +159,7 @@ def postsbysql(query, where='a=view', display_from_open_groups = False):
 	#czy nowe wiadomości; nieodebrane wiadomości:
 	od = select('select od from seen where do="{}" and unseen!=0'.format(username))
 	for i in od:
-		print('<h2 style="color: red">Masz nowe nieodebrane wiadomości od <a href="xx.cgi?a=mes&z=%s" onclick="location.reload()" target="_blank"><u>%s</u></a></h2>'%(i[0], imiona[i[0]]))
+		print('<h2 style="color: red">Masz nowe nieodebrane wiadomości od <a href="xx.py?a=mes&z=%s" onclick="location.reload()" target="_blank"><u>%s</u></a></h2>'%(i[0], imiona[i[0]]))
 	#
 	#wyzwania szachy:
 	challenges = select('select id, biale, czarne from chess where (biale="{u}" or czarne="{u}") and parent="propo" and proponent!="{u}"'.format(u=username))
@@ -319,7 +319,7 @@ elif act == 'mes_b':
 			select('insert into seen set od="{}", do="{}", unseen=1'.format(username, d['z']))
 		else:
 			select('update seen set unseen = unseen + 1 where od="{}" and do="{}"'.format(username, d['z']))
-	print('Location: xx.cgi?a=mes&z=%s\n'%d['z'])
+	print('Location: xx.py?a=mes&z=%s\n'%d['z'])
 
 elif act == 'anm': #are new messages
 	print()
