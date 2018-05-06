@@ -29,6 +29,9 @@ def sel_list(query):
 		l.append(i[0])
 	return l
 
+def sel_one(query):
+	return select(query)[0][0]
+
 try:
 	a = os.environ['HTTP_COOKIE']
 	while len(a) > 4 and not str.startswith(a, 'sid='):
@@ -154,18 +157,9 @@ nazwy_grup = {str(x[0]): str(x[1]) for x in nazwy_grup_l}
 
 def postsbysql(query, where='a=view', display_from_open_groups = False):
 	#czy nowe wiadomości; nieodebrane wiadomości:
-	last_mes_query = sel_list('select czas from last_mes_query where username="%s"'%username)[0]
-	last_rec_mes = select('select czas, od from messages where do="%s" order by czas desc'%username)
-        	
-	unread_displayed = set()
-
-	for j in last_rec_mes:
-		if last_mes_query < j[0] and j[1] not in unread_displayed:
-			print('<h2 style="color: red">Masz nowe nieodebrane wiadomości od <a href="xx.cgi?a=mes&z=%s" onclick="location.reload()" target="_blank"><u>%s</u></a></h2>'%(j[1], imiona[j[1]]))
-			unread_displayed.add(j[1])
-			#m['body_o'] = m['body_o'].replace('<div class="fixed_entry">Wiadomości</div>', '<div class="fixed_entry" style="background:red">Wiadomości</div>')
-		else:
-			break;
+	od = select('select od from seen where do="{}" and unseen!=0'.format(username))
+	for i in od:
+		print('<h2 style="color: red">Masz nowe nieodebrane wiadomości od <a href="xx.cgi?a=mes&z=%s" onclick="location.reload()" target="_blank"><u>%s</u></a></h2>'%(i[0], imiona[i[0]]))
 	#
 	#wyzwania szachy:
 	challenges = select('select id, biale, czarne from chess where (biale="{u}" or czarne="{u}") and parent="propo" and proponent!="{u}"'.format(u=username))
@@ -319,22 +313,26 @@ elif act == "invite_b":
 elif act == 'mes_b':
 	if not set(d['content']) <= set('\n\t '):
 		select('insert into messages values(0, "{}", "{}", "{}", now(), 0)'.format(username, d['z'], d['content']))
+		#widoczność:
+		l = select('select unseen from seen where od="{}" and do="{}"'.format(username, d['z']))
+		if not len(l):
+			select('insert into seen set od="{}", do="{}", unseen=1'.format(username, d['z']))
+		else:
+			select('update seen set unseen = unseen + 1 where od="{}" and do="{}"'.format(username, d['z']))
 	print('Location: xx.cgi?a=mes&z=%s\n'%d['z'])
 
 elif act == 'anm': #are new messages
 	print()
 	try:
-		last_mes_query = sel_list('select czas from last_mes_query where username="%s"'%username)[0]
-		last_message_time = sel_list('''select czas from messages where 
-		((od = "{u}" and do = "{z}") or (od = "{z}" and do = "{u}")) order by czas desc limit 1'''.format(czas = int(last_mes_query.timestamp()),u = username, z = d['z']))[0]
-	except (IndexError, KeyError):
+		unseen = sel_one('select unseen from seen where od="{}" and do="{}"'.format(d['z'], username))
+	except IndexError:
+		unseen = 0
+	if unseen == 0:
+		print(0)
+		exit()
+	else:
 		print(1)
 		exit()
-
-	if(last_mes_query < last_message_time):
-		print(1)
-	else:
-		print(0)
 
 elif act == "anm_chess": #are new moves
 	print()
@@ -352,12 +350,10 @@ elif act == "anm_chess": #are new moves
 
 elif act == 'messages':
 	print()
-	
-	last_mes_query = sel_list('select czas from last_mes_query where username="%s"'%username)[0]
-	dates_before_query = sel_list('''select count(id) from messages where 
-		((od = "{u}" and do = "{z}") or (od = "{z}" and do = "{u}")) and czas > from_unixtime({czas})'''.format(czas = int(last_mes_query.timestamp()),u = username, z = d['z']))[0]
+
+	unseen = sel_one('select unseen from seen where od="{}" and do="{}"'.format(d['z'], username))
 	d.setdefault('weeks', 12)
-	d['weeks'] = max(d['weeks'], dates_before_query)
+	d['weeks'] = max(d['weeks'], unseen)
 
 	messages = select('(select content, od, czas from messages where (od = "{u}" and do = "{z}") or (od = "{z}" and do = "{u}") order by czas desc limit {weeks}) order by czas asc'.format(weeks = d['weeks'], u = username, z = d['z']))
 	for mes in messages:
@@ -367,10 +363,10 @@ elif act == 'messages':
 			otag = m['almes_o']
 		otag = otag.replace('{time}', str(mes[2]))
 		print(otag, mes[0], '<br></span><br>')
-	
-	select('delete from last_mes_query where username = "{}"'.format(username))
-	select('insert into last_mes_query values ("{}", now())'.format(username))
 
+	select('update seen set unseen = 0 where od="{}" and do="{}"'.format(d['z'], username))
+
+	
 elif act == "groups":
 	print()
 	print(m['head'], m['body_o'])
@@ -735,12 +731,14 @@ elif act == "chess_b":
 			if biale_t - elapsed <= 0:
 				select('update chess set wynik = -1 where id=%s'%d['id'])
 				print('Location: xx.py?a=chess&id=%s\n'%d['id'])
+				db.commit()
 				exit()
 		else:
 			select('update chess set czarne_t = %d where id=%s'%(czarne_t - elapsed, d['id']))
 			if czarne_t - elapsed <= 0:
 				select('update chess set wynik = 1 where id=%s'%d['id'])
 				print('Location: xx.py?a=chess&id=%s\n'%d['id'])
+				db.commit()
 				exit()
 
 	if movep in b.legal_moves:
