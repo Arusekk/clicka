@@ -407,10 +407,9 @@ elif act == "group":
 	
 	if int(d['id']) not in belonging_groups and group_type not in (1, '1'):
 		print("\n<h1>Nie należysz do tej grupy!</h1>")
-		#print(belonging_groups)
 		exit(0)
 
-	print("\n", m['head'], m['body_o'], "</div>", m['main_o']) #TODO: wypisz grupy, w view już zrobiono
+	print("\n", m['head'], m['body_o'], m['entryp_o'].replace("{}", "panel&g={}".format(d['id'])), "Opcje grupy</div></div>", m['main_o'])
 	print('<h1><u>{}</u></h1>'.format(nazwy_grup[d['id']]))
 	group_admin = sel_list('select admin from groups where id=%s'%d['id'])[0]
 	if group_admin == username:
@@ -422,20 +421,27 @@ elif act == "group":
 	postsbysql('select * from contents where parent_t = 2 and parent = "{}" order by date desc limit {}'.format(d['id'], d['weeks']), where='a=group&id=%s'%d['id'], display_from_open_groups = True)
 
 elif act == "panel":
-	group_admin = sel_list('select admin from groups where id=%s'%d['g'])[0]
-	if group_admin != username:
-		print('\n<h1>Nie jesteś administratorem tej grupy!</h1>')
+	group_admin, group_type = select('select admin, typ from groups where id=%s'%d['g'])[0]
+	if group_type in (0, 2) and int(d['g']) not in belonging_groups:
+		print('\n<h1>Odmowa dostępu.</h1>')
 		exit()
+	is_admin = False
+	if group_admin == username:
+		is_admin = True
 
 	print("\n<h3>Do grupy należą:</h1>")
 	members = sel_list("select user from group_belonging where groupid=%s"%d['g'])
 	for i in members:
-		print(imiona[i], '<a href="xx.py?a=group_rem&groupid={}&whom={}">Usuń</a>'.format(d['g'], i),"<br>")
+		print(imiona[i])
+		if is_admin : print ('<a href="xx.py?a=group_rem&groupid={}&whom={}">Usuń</a>'.format(d['g'], i))
+		print('<br>')
 
-	print('<h3>Dodaj do grupy:</h3>')
-	for i in imiona.keys():
-		if i not in members:
-			print('<a href="xx.py?a=group_add&groupid={}&whom={}">'.format(d['g'], i), imiona[i], '</a><br>')
+	if is_admin:
+		print('<h3>Dodaj do grupy:</h3>')
+		for i in imiona.keys():
+			if i not in members:
+				print('<a href="xx.py?a=group_add&groupid={}&whom={}">'.format(d['g'], i), imiona[i], '</a><br>')
+	print('<a href="xx.py?a=group_rem&groupid={}&whom={}"><h3>Opuść grupę</h3></a>'.format(d['g'], username))			
 	print('<a href="xx.py?a=group&id=%s"><h3>Powrót</h3></a>'%d['g'])
 
 elif act == "group_add":
@@ -455,12 +461,15 @@ elif act == "group_add":
 
 elif act == "group_rem":
 	group_admin = sel_list('select admin from groups where id=%s'%d['groupid'])[0]
-	if group_admin != username:
-		print('<h1>Nie jesteś administratorem tej grupy!</h1>')
+	if group_admin != username and d['whom'] != username:
+		print('\n<h1>Nie jesteś administratorem tej grupy!</h1>')
 		exit()
 
 	select('delete from group_belonging where groupid=%s and user="%s"'%(d['groupid'], d['whom']))
-	print('Location: xx.py?a=panel&g=%s\n'%d['groupid'])
+	if group_admin == username: 
+		print('Location: xx.py?a=panel&g=%s\n'%d['groupid'])
+	else: 
+		print('Location: xx.py\n')
 
 elif act == "myspace":
 	print('Location: xx.py?a=space&user=%s\n'%username)
