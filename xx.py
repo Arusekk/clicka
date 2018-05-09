@@ -358,19 +358,25 @@ elif act == 'messages':
 	d['weeks'] = max(d['weeks'], unseen)
 
 	messages = select('(select content, od, czas from messages where (od = "{u}" and do = "{z}") or (od = "{z}" and do = "{u}") order by czas desc limit {weeks}) order by czas asc'.format(weeks = d['weeks'], u = username, z = d['z']))
+	is_last_message_mine = False
 	for mes in messages:
 		if mes[1] == username:
 			otag = m['mymes_o']
+			is_last_message_mine = True
 		else:
 			otag = m['almes_o']
+			is_last_message_mine = False
 		otag = otag.replace('{time}', str(mes[2]))
 		print(otag, mes[0], '<br></span><br>')
+
+	if is_last_message_mine and sel_one('select unseen from seen where od="{}" and do="{}"'.format(username, d['z'])) == 0:
+		print('<span style="color:grey">Wyświetlono</p>')
 
 	select('update seen set unseen = 0 where od="{}" and do="{}"'.format(d['z'], username))
 
 elif act == "mes":
 	print()
-	d.setdefault('z', sel_one('select do from messages where od = "{}" group by do order by count(czas) desc limit 1;'.format(username)))
+	d.setdefault('z', sel_one('select do from messages where od = "{}" group by do order by max(czas) desc limit 1;'.format(username)))
 	
 	print(m['head'], m['body_o'], '<script>z = "{}"</script>'.format(d['z']))
 	rozmowcy = sel_list('select od from messages where do="{u}" group by od order by max(czas) desc limit 10'.format(u=username))
@@ -381,7 +387,6 @@ elif act == "mes":
 	print('<span id="messages">\n</span>')
 
 	print(m['mes_form'], m['audios'])
-	print("<h3 style=\"color: green\">Wiadomości odświeżają się same.</h3>")
 	
 elif act == "groups":
 	print()
@@ -542,7 +547,7 @@ elif act == "register_b":
 	select('update invitations set active = 0 where link = "{}"'.format(d['id']))
 	select('update invitations set registered = now() where link = "{}"'.format(d['id']))
 	select('insert into users values("{}", "{}", "{}", 0, "{}")'.format(d['username'], pswd, d['imie'], d['id']))
-	select('insert into last_mes_query values("{}", now())'.format(d['username']))
+	#select('insert into last_mes_query values("{}", now())'.format(d['username'])) #jakby się sypało to raczej nie tu
 	print("Location: xx.cgi\n")
 	print('\n')
 
