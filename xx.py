@@ -272,7 +272,7 @@ elif act == "view":
 
 	#postsbysql('select * from contents where datediff(now(), date) <= 7*{} order by date desc'.format(d['weeks']))
 	d.setdefault('weeks', 6)
-	postsbysql('select * from contents where parent_t in (0, 1) or parent in (select groupid from belonging_groups where user="{}") order by date desclimit {}'.format(username, d['weeks']))
+	postsbysql('select * from contents where parent_t in (0, 1) or parent in (select groupid from group_belonging where user="{}") order by date desc limit {}'.format(username, d['weeks']))
 
 elif act == "like_b":
 	resp = 'inni'

@@ -280,7 +280,7 @@ int main() {
       std::string tg = "<img src=\"xx.py?a=img&img=_profile_{}&size=medium\">";
       rpl(tg, 1, res->getString("username"));
       std::string tmp =
-          "<br><a href=\"xx.cgi?a=mes&z={}\"><button>Wiadomość</button></a><a "
+          "<br><a href=\"xx.py?a=mes&z={}\"><button>Wiadomość</button></a><a "
           "href=\"xx.py?a=space&user={}\"><button>Przestrzeń</button></a><a "
           "href=\"xx.py?a=challenge_b&whom={}\"><button>Zaproponuj szachy</button></a></"
           "div><br>";
