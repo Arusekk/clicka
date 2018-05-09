@@ -67,8 +67,6 @@ fl = open("html").read().splitlines()
 for k, v in zip(fl[::2], fl[1::2]):
 	m[k] = v
 
-#m['head'] = m['head'].replace("{}", open("style.css").read())
-
 is_uploaded_image = False
 image_filename = ""
 
@@ -274,7 +272,7 @@ elif act == "view":
 
 	#postsbysql('select * from contents where datediff(now(), date) <= 7*{} order by date desc'.format(d['weeks']))
 	d.setdefault('weeks', 6)
-	postsbysql('select * from contents order by date desc limit {}'.format(d['weeks']))
+	postsbysql('select * from contents where parent_t in (0, 1) or parent in (select groupid from belonging_groups where user="{}") order by date desclimit {}'.format(username, d['weeks']))
 
 elif act == "like_b":
 	resp = 'inni'
