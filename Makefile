@@ -4,7 +4,7 @@ CXXFLAGS := -O2 -std=c++11 -Wall -Wextra -Wshadow -Wconversion -pedantic
 all: xx
 
 xx: xx.o gen.o
-	$(CXX) $(CXXFLAGS) xx.o gen.o -lmysqlcppconn -lcryptopp -o xx
+	$(CXX) $(CXXFLAGS) xx.o gen.o -lmysqlcppconn -o xx
 
 xx.o: xx.cpp
 	$(CXX) $(CXXFLAGS) -c -o xx.o xx.cpp

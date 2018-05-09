@@ -10,25 +10,9 @@
 #include <cppconn/statement.h>
 #include <mysql_connection.h>
 
-#include <crypto++/cryptlib.h>
-#include <cryptopp/filters.h>
-#include <cryptopp/hex.h>
-#include <cryptopp/sha.h>
-
 #include <boost/algorithm/string.hpp>
 
 using namespace boost;
-
-std::string sha256(std::string a) {
-  CryptoPP::SHA256 h256;
-  std::string b;
-
-  CryptoPP::StringSource(
-      a, true,
-      new CryptoPP::HashFilter(
-          h256, new CryptoPP::HexEncoder(new CryptoPP::StringSink(b))));
-  return b;
-}
 
 std::string escape(std::string &a) {
   replace_all(a, "\"", "?");

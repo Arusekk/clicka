@@ -420,7 +420,7 @@ elif act == "group":
 	if group_type in (1, '1') and int(d['id']) not in belonging_groups:
 		print('<h3>Nie należysz do tej otwartej grupy. <a href="xx.py?a=group_add&groupid=%s&whom=%s&return=group"><u>Dołącz do grupy</u></a></h3>'%(d['id'], username))
 
-	d.setdefault('weeks', 6)
+	d.setdefault('weeks', 5)
 	postsbysql('select * from contents where parent_t = 2 and parent = "{}" order by date desc limit {}'.format(d['id'], d['weeks']), where='a=group&id=%s'%d['id'], display_from_open_groups = True)
 
 elif act == "panel":
