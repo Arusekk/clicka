@@ -533,6 +533,7 @@ elif act == "register_b":
 
 		if d['imie'] in sel_list('select imie from users'):
 			print("\nImię, które podałeś, jest już zajęte. Pamiętaj, że nie wolno podszywać się pod osoby, którymi nie jesteś, oraz że twoje imię musi umożliwiać innym zidentyfikowanie cię")
+			exit(0)
 
 	except KeyError:
 		print('\nWszystkie pola są obowiązkowe.')
@@ -546,8 +547,9 @@ elif act == "register_b":
 	select('update invitations set registered = now() where link = "{}"'.format(d['id']))
 	select('insert into users values("{}", "{}", "{}", 0, "{}")'.format(d['username'], pswd, d['imie'], d['id']))
 	#select('insert into last_mes_query values("{}", now())'.format(d['username'])) #jakby się sypało to raczej nie tu
-	print("Location: xx.cgi\n")
+	print("Location: xx.py\n")
 	print('\n')
+	db.commit()
 
 elif act == 'create_group':
 	print()
