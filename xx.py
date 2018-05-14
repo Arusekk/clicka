@@ -259,7 +259,7 @@ elif act == "invite_b":
 elif act == 'mes_b':
 	if not set(d['content']) <= set('\n\t '):
 		select('insert into messages values(0, "{}", "{}", "{}", now(), 0)'.format(username, d['z'], d['content']))
-		notify([d['z']], "Dostałeś nową wiadomość od {} o treści '{}'".format(imiona[username], d['content']))
+		notify([d['z']], "Dostałeś nową [wiadomość](https://anx.nazwa.pl?xx.py?a=mes&z={}) od {} o treści '{}'".format(username, imiona[username], d['content']))
 		#widoczność:
 		l = select('select unseen from seen where od="{}" and do="{}"'.format(username, d['z']))
 		if not len(l):
@@ -730,7 +730,7 @@ elif act == "chess_b":
 		turn = (bcq[0] if b.turn else bcq[1])
 		select('update chess set stan = "%s", last_move="%s", history="%s", turn="%s", last_move_t = now() where id=%s'%(b.fen(), move, history, turn, d['id']))
 		
-		notify([opponent], "Jest twój ruch w grze z {}. Przeciwnik ruszył się {}".format(imiona[username], move))
+		notify([opponent], "Jest twój ruch w [grze](https://anx.nazwa.pl/xx.py?a=chess&id={}) z {}".format(d['id'], imiona[username]))
 		
 		if(b.result() != '*'):
 			if(b.result() == '1-0'):
