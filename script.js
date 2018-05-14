@@ -20,7 +20,7 @@ function check_if_new_messages()
 			reload_messages();
 			document.getElementById('e9').play();
 			if(focus == 0)
-				document.title = "Nowa wiadomość"
+				document.title = "Nowa wiadomość";
 		}
 	});
 }
@@ -34,9 +34,9 @@ function check_if_new_moves()
 			{
 					document.getElementById('e9').play();
 					document.getElementById('e9').onended = function () {location.reload();}
-					document.getElementsByTagName('svg')[0].innerHTML = ""
-					document.getElementsByTagName('h1')[0].innerHTML = "Ładowanie…"
-					document.title = "TWÓJ RUCH"
+					document.getElementsByTagName('svg')[0].innerHTML = "";
+					document.getElementsByTagName('h1')[0].innerHTML = "Ładowanie…";
+					document.title = "TWÓJ RUCH";
 			}
 			else
 			{
@@ -67,7 +67,7 @@ function main()
 {
 	//$(".comments").hide();
 	$(".comment_form").hide();
-	window.onfocus = function () {focus = 1; document.title = "Clicka"}
+	window.onfocus = function () {focus = 1; document.title = "Clicka";}
 	window.onblur = function () {focus = 0;}
 	if($('#messages').length)
 	{	
