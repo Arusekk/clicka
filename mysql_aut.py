@@ -23,7 +23,10 @@ def sel_list(query):
 	return l
 
 def sel_one(query):
-	return select(query)[0][0]
+	try:
+		return select(query)[0][0]
+	except:
+		return 0
 
 try:
 	a = os.environ['HTTP_COOKIE']
@@ -45,8 +48,6 @@ try:
 	cu.execute('select username from sessions where sid = "{}"'.format(sid))
 	c = cu.fetchall()
 	username = c[0][0]
-	import metacircles
-	dome = metacircles.Dome(username)
 	try:
 		select('insert into activities values ("%s", now(), "%s", "%s")'%(username, os.getenv("REQUEST_URI"), os.getenv('REMOTE_ADDR')))
 	except: pass
