@@ -259,7 +259,7 @@ elif act == "invite_b":
 elif act == 'mes_b':
 	if not set(d['content']) <= set('\n\t '):
 		select('insert into messages values(0, "{}", "{}", "{}", now(), 0)'.format(username, d['z'], d['content']))
-		notify([d['z']], "Dostałeś nową wiadomość od {}".format(username))
+		notify([d['z']], "Dostałeś nową wiadomość od {}".format(imiona[username]))
 		#widoczność:
 		l = select('select unseen from seen where od="{}" and do="{}"'.format(username, d['z']))
 		if not len(l):
