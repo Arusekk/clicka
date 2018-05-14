@@ -1,13 +1,20 @@
 import pymysql, os, cgi
-db = pymysql.connect("localhost", "antek", open("/var/www/mysql_password").read()[:-1], "xx", charset="utf8")
-cu = db.cursor()
 
-form = cgi.FieldStorage();
-d = dict()
 try:
-	act = form["a"].value
-except KeyError:
-	act = 'view'
+	db
+except NameError:
+	db = pymysql.connect("localhost", "antek", open("/var/www/mysql_password").read()[:-1], "xx", charset="utf8")
+	cu = db.cursor()
+
+try:
+	d
+except NameError:
+	form = cgi.FieldStorage();
+	d = dict()
+	try:
+		act = form["a"].value
+	except KeyError:
+		act = 'view'
 
 def select(query):
 	cu.execute(query)
@@ -29,30 +36,35 @@ def sel_one(query):
 		return 0
 
 try:
-	a = os.environ['HTTP_COOKIE']
-	while len(a) > 4 and not str.startswith(a, 'sid='):
-	    a = a[1:]
-	b = a.split("=")
-
-	if(b[0] == "sid"):
-		sid = b[1]
-		for l in sid:
-			if l == ';':
-				sid = sid.split(';')[0]
-				break
-			elif l not in 'abcdefghijklmnopqrstuvwxyz':
-				print('\nTwój sid jest nieprawdiłowy. Jeśli uważasz, że to nie twoja wina, zgłoś błąd w <a href="https://anx.nazwa.pl:65000/antek/clicka/issues">bug trackerze.</a>')
-				print(sid)
-				exit()
-
-	cu.execute('select username from sessions where sid = "{}"'.format(sid))
-	c = cu.fetchall()
-	username = c[0][0]
+	username
+except NameError:
 	try:
-		select('insert into activities values ("%s", now(), "%s", "%s")'%(username, os.getenv("REQUEST_URI"), os.getenv('REMOTE_ADDR')))
-	except: pass
-except (KeyError, IndexError, NameError):
-	if act not in ('register', 'register_b', 'login_b'):
-		print("Location: xx.cgi\n")
-		exit(0)
-	username = None
+		a = os.environ['HTTP_COOKIE']
+		while len(a) > 4 and not str.startswith(a, 'sid='):
+		    a = a[1:]
+		b = a.split("=")
+
+		if(b[0] == "sid"):
+			sid = b[1]
+			for l in sid:
+				if l == ';':
+					sid = sid.split(';')[0]
+					break
+				elif l not in 'abcdefghijklmnopqrstuvwxyz':
+					print('\nTwój sid jest nieprawdiłowy. Jeśli uważasz, że to nie twoja wina, zgłoś błąd w <a href="https://anx.nazwa.pl:65000/antek/clicka/issues">bug trackerze.</a>')
+					print(sid)
+					exit()
+
+		cu.execute('select username from sessions where sid = "{}"'.format(sid))
+		c = cu.fetchall()
+		username = c[0][0]
+		#import metacircles
+    #dome = metacircles.Dome(username)
+		try:
+			select('insert into activities values ("%s", now(), "%s", "%s")'%(username, os.getenv("REQUEST_URI"), os.getenv('REMOTE_ADDR')))
+		except: pass
+	except (KeyError, IndexError, NameError):
+		if act not in ('register', 'register_b', 'login_b'):
+			print("Location: xx.cgi\n")
+			exit(0)
+		username = None
