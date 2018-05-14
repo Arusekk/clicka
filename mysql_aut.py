@@ -55,8 +55,8 @@ except NameError:
 		cu.execute('select username from sessions where sid = "{}"'.format(sid))
 		c = cu.fetchall()
 		username = c[0][0]
-		import metacircles
-		dome = metacircles.Dome(username)
+		#import metacircles
+                #dome = metacircles.Dome(username)
 		try:
 			select('insert into activities values ("%s", now(), "%s", "%s")'%(username, os.getenv("REQUEST_URI"), os.getenv('REMOTE_ADDR')))
 		except: pass

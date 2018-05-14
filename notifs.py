@@ -11,7 +11,7 @@ class Notifiee:
 			self.tg, self.mail, self.settings = 3*[None]
 	def send(self, text, traits):
 		if self.mail not in ('', None):
-			sb.Popen(['/usr/sbin/sendmail', '-fclicka', self.mail], stdin=sb.PIPE).communicate(text)
+                    sb.Popen(['/usr/sbin/sendmail', '-fclicka', self.mail], stdin=sb.PIPE).communicate(b'Subject: Powiadomienie z Clicki\n'+encode(text,'utf8')+b'\n.\n')
 		if self.tg not in ('', None):
 			data = {'chat_id': self.tg, 'text': text, 'parse_mode': 'Markdown'}
 			r = requests.post('https://api.telegram.org/bot{}/sendMessage'.format(tg_token), data=data)
