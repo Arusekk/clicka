@@ -51,7 +51,7 @@ try:
 	try:
 		select('insert into activities values ("%s", now(), "%s", "%s")'%(username, os.getenv("REQUEST_URI"), os.getenv('REMOTE_ADDR')))
 	except: pass
-except (KeyError, IndexError):
+except (KeyError, IndexError, NameError):
 	if act not in ('register', 'register_b', 'login_b'):
 		print("Location: xx.cgi\n")
 		exit(0)
