@@ -23,6 +23,8 @@ install:
 	cp html /var/www/html
 	cp style.css /var/www/html/style.css
 	cp xx.py /var/www/html/xx.py
+	cp mysql_aut.py /var/www/html/mysql_aut.py
+	cp notifs.py /var/www/html/notifs.py
 	cp script.js /var/www/html/script.js
 
 uninstall:

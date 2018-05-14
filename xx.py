@@ -7,6 +7,7 @@ import time
 print('Content-type: text/html; charset="utf8"')
 
 from mysql_aut import * 
+from notifs import notify
 
 m = {}
 fl = open("html").read().splitlines()
@@ -258,6 +259,7 @@ elif act == "invite_b":
 elif act == 'mes_b':
 	if not set(d['content']) <= set('\n\t '):
 		select('insert into messages values(0, "{}", "{}", "{}", now(), 0)'.format(username, d['z'], d['content']))
+		notify([d['z']], "Dostałeś nową wiadomość od {}".format(username))
 		#widoczność:
 		l = select('select unseen from seen where od="{}" and do="{}"'.format(username, d['z']))
 		if not len(l):
@@ -725,12 +727,16 @@ elif act == "chess_b":
 		b.push(move)
 		turn = (bcq[0] if b.turn else bcq[1])
 		select('update chess set stan = "%s", last_move="%s", history="%s", turn="%s", last_move_t = now() where id=%s'%(b.fen(), move, history, turn, d['id']))
+		
+		notify([opponent], "Jest twój ruch w grze z {}. Przeciwnik ruszył się {}".format(imiona[username], move))
+		
 		if(b.result() != '*'):
-			#print("\n", b.result())
 			if(b.result() == '1-0'):
 				select('update chess set wynik = %d where id=%s'%(1, d['id']))
+				notify([opponent], "{} zwyciężył w szachy".format(imiona[bcq[0]]))
 			elif(b.result() == '0-1'):
 				select('update chess set wynik = %d where id=%s'%(-1, d['id']))
+				notify([opponent], "{} zwyciężył w szachy".format(imiona[bcq[1]]))
 	else:
 		print()
 		if(b.is_into_check(move) or b.is_into_check(movep)):
