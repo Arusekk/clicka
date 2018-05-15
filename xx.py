@@ -268,7 +268,8 @@ elif act == 'mes_b':
 			tm = sel_one('select timediff(now(), max(date)) from activities where username="{}" and act="/xx.py?a=anm&z={}"'.format(username, d['z']))
 			if datetime.timedelta(minutes=15) < tm:
 				notify([d['z']], "Dostałeś nową [wiadomość](https://anx.nazwa.pl/xx.py?a=mes&z={}) od {} o treści '{}'".format(username, imiona[username], d['content']))
-		except TypeError: pass
+		except TypeError:
+			notify([d['z']], "Dostałeś nową [wiadomość](https://anx.nazwa.pl/xx.py?a=mes&z={}) od {} o treści '{}'".format(username, imiona[username], d['content']))
 
 		#widoczność:
 		l = select('select unseen from seen where od="{}" and do="{}"'.format(username, d['z']))
@@ -574,7 +575,7 @@ elif act == "login_b":
 
 	import random
 	sid = ''.join(chr(random.choice(range(ord('a'), ord('z')+1))) for x in range(127))
-	select('delete from sessions where username="%s"'%login)
+	#select('delete from sessions where username="%s"'%login)
 	select('insert into sessions values("%s", "%s", now(), 0)'%(sid, login))
 	print('Set-Cookie: sid=%s'%sid)
 	print('Location: xx.py?a=view\n')
