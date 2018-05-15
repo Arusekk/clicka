@@ -259,6 +259,7 @@ elif act == "invite_b":
 elif act == 'mes_b':
 	if not set(d['content']) <= set('\n\t '):
 		select('insert into messages values(0, "{}", "{}", "{}", now(), 0)'.format(username, d['z'], d['content']))
+
 		notify([d['z']], "Dostałeś nową [wiadomość](https://anx.nazwa.pl/xx.py?a=mes&z={}) od {} o treści '{}'".format(username, imiona[username], d['content']))
 		#widoczność:
 		l = select('select unseen from seen where od="{}" and do="{}"'.format(username, d['z']))
@@ -276,9 +277,11 @@ elif act == 'anm': #are new messages
 		unseen = 0
 	if unseen == 0:
 		print(0)
+		db.commit()
 		exit()
 	else:
 		print(1)
+		db.commit()
 		exit()
 
 elif act == "anm_chess": #are new moves

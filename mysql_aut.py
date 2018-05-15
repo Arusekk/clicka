@@ -62,7 +62,7 @@ except NameError:
     #dome = metacircles.Dome(username)
 		try:
 			select('insert into activities values ("%s", now(), "%s", "%s")'%(username, os.getenv("REQUEST_URI"), os.getenv('REMOTE_ADDR')))
-		except: pass
+		except KeyError: pass
 	except (KeyError, IndexError, NameError):
 		if act not in ('register', 'register_b', 'login_b'):
 			print("Location: xx.cgi\n")
