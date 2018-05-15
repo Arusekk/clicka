@@ -263,9 +263,12 @@ elif act == 'mes_b':
 		select('insert into messages values(0, "{}", "{}", "{}", now(), 0)'.format(username, d['z'], d['content']))
 		db.commit()
 
-		import datetime
-		if datetime.timedelta(minutes=15) > sel_one('select timediff(max(date), now()) from activities where username="{}" and act="/xx.py?a=anm&z={}"'.format(username, d['z'])):
-			notify([d['z']], "Dostałeś nową [wiadomość](https://anx.nazwa.pl/xx.py?a=mes&z={}) od {} o treści '{}'".format(username, imiona[username], d['content']))
+		try:
+			import datetime
+			sel_one('select timediff(max(date), now()) from activities where username="{}" and act="/xx.py?a=anm&z={}"'.format(username, d['z']))
+			if datetime.timedelta(minutes=15) > sel_one('select timediff(max(date), now()) from activities where username="{}" and act="/xx.py?a=anm&z={}"'.format(username, d['z'])):
+				notify([d['z']], "Dostałeś nową [wiadomość](https://anx.nazwa.pl/xx.py?a=mes&z={}) od {} o treści '{}'".format(username, imiona[username], d['content']))
+		except: pass
 
 		#widoczność:
 		l = select('select unseen from seen where od="{}" and do="{}"'.format(username, d['z']))
