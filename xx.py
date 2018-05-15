@@ -265,7 +265,7 @@ elif act == 'mes_b':
 
 		try:
 			import datetime
-			sel_one('select timediff(max(date), now()) from activities where username="{}" and act="/xx.py?a=anm&z={}"'.format(username, d['z']))
+			sel_one('select timediff(now(), max(date)) from activities where username="{}" and act="/xx.py?a=anm&z={}"'.format(username, d['z']))
 			if datetime.timedelta(minutes=15) > sel_one('select timediff(max(date), now()) from activities where username="{}" and act="/xx.py?a=anm&z={}"'.format(username, d['z'])):
 				notify([d['z']], "Dostałeś nową [wiadomość](https://anx.nazwa.pl/xx.py?a=mes&z={}) od {} o treści '{}'".format(username, imiona[username], d['content']))
 		except: pass
