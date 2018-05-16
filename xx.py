@@ -78,21 +78,6 @@ for i in form:
 			img.save(filename=sflname+'__small.png')
 			db.commit()
 			exit(0)
-	try:
-		v = form[i].value
-	except KeyError:
-		print('\n\n', form[i])
-		exit(0)
-	#if i == 'pswd1' or i == 'pswd2' or i == 'passwd':
-	#	for j in range(len(v)):
-	#		if ord(v[j]) not in range(32, 126):
-	#			v = v.replace(v[j], '*')
-
-	v = cgi.escape(v)
-	v = v.replace('"', "&quot;")
-	v = v.replace("'", "&#8217;")
-	v = v.replace("\\", "&#92;")
-	d[i] = v;
 
 cu.execute("select username, imie from users")
 res = cu.fetchall()
@@ -676,7 +661,7 @@ elif act == "chess":
 elif act == "chess_b":
 	import chess
 
-	fen, history, result, public, biale_t, czarne_t, time_limit, last_move_t = select('select stan, history, wynik, public, biale_t, czarne_t, time_limit, last_move_t from chess where id=%s and (biale="%s" or czarne="%s")'%(d['id'], username, username))[0]
+	fen, history, result, public, biale_t, czarne_t, time_limit, last_move_t, ramy = select('select stan, history, wynik, public, biale_t, czarne_t, time_limit, last_move_t, parent from chess where id=%s and (biale="%s" or czarne="%s")'%(d['id'], username, username))[0]
 	bcq = select('select biale, czarne from chess where id=%s'%d['id'])[0]
 	if (bcq[0] == username):
 		user_color = True
@@ -742,7 +727,7 @@ elif act == "chess_b":
 		b.push(move)
 		turn = (bcq[0] if b.turn else bcq[1])
 		select('update chess set stan = "%s", last_move="%s", history="%s", turn="%s", last_move_t = now() where id=%s'%(b.fen(), move, history, turn, d['id']))
-		notify([opponent], "Jest twój ruch w [grze](https://anx.nazwa.pl/xx.py?a=chess&id={}) z {}".format(d['id'], imiona[username]))
+		notify([opponent], "Jest twój ruch w [grze](https://anx.nazwa.pl/xx.py?a=chess&id={}) z {}{ramy}".format(d['id'], imiona[username], ramy=('w ramach ' + ramy if ramy != 'challenge_accepted' else '')))
 		
 		if(b.result() != '*'):
 			if(b.result() == '1-0'):
