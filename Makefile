@@ -26,6 +26,7 @@ install:
 	cp mysql_aut.py /var/www/html/mysql_aut.py
 	cp notifs.py /var/www/html/notifs.py
 	cp settings.py /var/www/html/settings.py
+	cp tg.py /var/www/html/tg.py
 	cp script.js /var/www/html/script.js
 
 uninstall:
