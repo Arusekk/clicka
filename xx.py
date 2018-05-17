@@ -754,7 +754,7 @@ elif act == "challenge_b":
 			biale, czarne = czarne, biale
 		select('insert into chess set biale = "%s", czarne = "%s", proponent="%s", parent="propo" '%(biale, czarne, username))
 		print('\n', m['head'], m['body_o'], '</div>', m['main_o'], '<h1>Zaproszono użytkownika do gry</h1></div>')
-                notify([d['whom']], imiona[username] + ' zaprasza cię do towarzyskiej gry w szachy.');
+		notify([d['whom']], imiona[username] + ' zaprasza cię do towarzyskiej gry w szachy.');
 	elif 'id' in d.keys():
 		if d['resp'] == 'accept':
 			select('update chess set parent="challenge_accepted", start_time = now() where id=%s'%(d['id']))
