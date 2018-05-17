@@ -166,11 +166,6 @@ def postsbysql(query, where='a=view', display_from_open_groups = False):
 		comments = select('select * from comments where parent=%d'%post_id)
 		#comments_count = sel_list('select count(*) from comments where parent=%d'%post_id)[0]
 		print('''<div class="commentsbox" onclick="show_comments({})">Napisz komentarz</div>'''.format(post_id))
-		
-		# if(int(comments_count) in range(1, 4)):
-		# 	print('<div class="comments" id="c{}" lt3>'.format(post_id))
-		# else:
-		# 	print('<div class="comments" id="c{}">'.format(post_id))
 
 		print('<div class="comments" id="c{}">'.format(post_id))
 
@@ -223,16 +218,10 @@ elif act == "view":
 	postsbysql('select * from contents where parent_t in (0, 1) or parent in (select groupid from group_belonging where user="{}") order by date desc limit {}'.format(username, d['weeks']))
 
 elif act == "like_b":
-	resp = 'inni'
 	select('delete from likes where user="{}" and parent_t = "{}" and parent="{}"'.format(username, d['parent_t'], d['parent']))
 	select('insert into likes values("{}", {}, "{}", now(), {})'.format(username, d['parent_t'], d['parent'], d['v']))
 	
-	if d['v'] == '1':
-		resp = select('select count(user) from likes where parent_t = 0 and parent = "{}" and value = 1'.format(i[0]))[0][0]
-	else:
-		resp = select('select count(user) from likes where parent_t = 0 and parent = "{}" and value = 0'.format(i[0]))[0][0]
 	print()
-	print(resp)
 
 elif act == "comment_b":
 	select('insert into comments values ("%s", %d, now(), "%s")'%(username, int(d['w']), d['content']))
