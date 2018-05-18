@@ -8,13 +8,22 @@ except NameError:
 
 try:
 	d
-except NameError:
+except (NameError):
 	form = cgi.FieldStorage();
 	d = dict()
 	try:
 		act = form["a"].value
 	except KeyError:
 		act = 'view'
+	for i in form:
+		if i in ('pic', 'file'):
+			continue
+		v = form[i].value
+		v = cgi.escape(v)
+		v = v.replace('"', "&quot;")
+		v = v.replace("'", "&#8217;")
+		v = v.replace("\\", "&#92;")
+		d[i] = v;
 
 def select(query):
 	cu.execute(query)

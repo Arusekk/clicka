@@ -78,21 +78,6 @@ for i in form:
 			img.save(filename=sflname+'__small.png')
 			db.commit()
 			exit(0)
-	try:
-		v = form[i].value
-	except KeyError:
-		print('\n\n', form[i])
-		exit(0)
-	#if i == 'pswd1' or i == 'pswd2' or i == 'passwd':
-	#	for j in range(len(v)):
-	#		if ord(v[j]) not in range(32, 126):
-	#			v = v.replace(v[j], '*')
-
-	v = cgi.escape(v)
-	v = v.replace('"', "&quot;")
-	v = v.replace("'", "&#8217;")
-	v = v.replace("\\", "&#92;")
-	d[i] = v;
 
 cu.execute("select username, imie from users")
 res = cu.fetchall()
@@ -255,7 +240,7 @@ elif act == 'mes_b':
 		try:
 			import datetime
 			tm = sel_one('select timediff(now(), max(date)) from activities where username="{}" and act="/xx.py?a=anm&z={}"'.format(username, d['z']))
-			if datetime.timedelta(minutes=15) < tm:
+			if datetime.timedelta(minutes=15) < tm or tm == 0:
 				notify([d['z']], "Dostałeś nową [wiadomość](https://anx.nazwa.pl/xx.py?a=mes&z={}) od {} o treści '{}'".format(username, imiona[username], d['content']))
 		except TypeError:
 			notify([d['z']], "Dostałeś nową [wiadomość](https://anx.nazwa.pl/xx.py?a=mes&z={}) od {} o treści '{}'".format(username, imiona[username], d['content']))
@@ -665,7 +650,7 @@ elif act == "chess":
 elif act == "chess_b":
 	import chess
 
-	fen, history, result, public, biale_t, czarne_t, time_limit, last_move_t = select('select stan, history, wynik, public, biale_t, czarne_t, time_limit, last_move_t from chess where id=%s and (biale="%s" or czarne="%s")'%(d['id'], username, username))[0]
+	fen, history, result, public, biale_t, czarne_t, time_limit, last_move_t, ramy = select('select stan, history, wynik, public, biale_t, czarne_t, time_limit, last_move_t, parent from chess where id=%s and (biale="%s" or czarne="%s")'%(d['id'], username, username))[0]
 	bcq = select('select biale, czarne from chess where id=%s'%d['id'])[0]
 	if (bcq[0] == username):
 		user_color = True
@@ -731,7 +716,7 @@ elif act == "chess_b":
 		b.push(move)
 		turn = (bcq[0] if b.turn else bcq[1])
 		select('update chess set stan = "%s", last_move="%s", history="%s", turn="%s", last_move_t = now() where id=%s'%(b.fen(), move, history, turn, d['id']))
-		notify([opponent], "Jest twój ruch w [grze](https://anx.nazwa.pl/xx.py?a=chess&id={}) z {}".format(d['id'], imiona[username]))
+		notify([opponent], "Jest twój ruch w [grze](https://anx.nazwa.pl/xx.py?a=chess&id={}) z {}{ramy}".format(d['id'], imiona[username], ramy=('w ramach ' + ramy if ramy != 'challenge_accepted' else '')))
 		
 		if(b.result() != '*'):
 			if(b.result() == '1-0'):
@@ -758,6 +743,7 @@ elif act == "challenge_b":
 			biale, czarne = czarne, biale
 		select('insert into chess set biale = "%s", czarne = "%s", proponent="%s", parent="propo" '%(biale, czarne, username))
 		print('\n', m['head'], m['body_o'], '</div>', m['main_o'], '<h1>Zaproszono użytkownika do gry</h1></div>')
+		notify([d['whom']], imiona[username] + ' zaprasza cię do towarzyskiej gry w szachy.');
 	elif 'id' in d.keys():
 		if d['resp'] == 'accept':
 			select('update chess set parent="challenge_accepted", start_time = now() where id=%s'%(d['id']))
