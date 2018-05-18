@@ -16,6 +16,8 @@ except (NameError):
 	except KeyError:
 		act = 'view'
 	for i in form:
+		if i in ('pic', 'file'):
+			continue
 		v = form[i].value
 		v = cgi.escape(v)
 		v = v.replace('"', "&quot;")
