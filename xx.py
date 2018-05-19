@@ -241,7 +241,7 @@ elif act == 'mes_b':
 			import datetime
 			tm = sel_one('select timediff(now(), max(date)) from activities where username="{}" and act="/xx.py?a=anm&z={}"'.format(d['z'], username))
 			if datetime.timedelta(minutes=15) < tm or tm == 0:
-				notify([d['z']], "Dostałeś nową [wiadomość](https://anx.nazwa.pl/xx.py?a=mes&z={}) od {} o treści '{}'".format(username, imiona[username], d['content']))
+				notify([d['z']], '[Wiadomość](https://anx.nazwa.pl/xx.py?a=mes&z={}) od {}: "{}"'.format(username, imiona[username], d['content']))
 		except TypeError:
 			notify([d['z']], "Dostałeś nową [wiadomość](https://anx.nazwa.pl/xx.py?a=mes&z={}) od {} o treści '{}'".format(username, imiona[username], d['content']))
 

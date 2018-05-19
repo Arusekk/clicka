@@ -47,5 +47,5 @@ elif mes[0] == '/':
     pass
 else:
     adresat = sel_one('select od from messages where do="{}" group by od order by max(czas) desc limit 1'.format(username))
-    data = {'content:' mes}
+    data = {'content': mes}
     requests.post('https://anx.nazwa.pl/xx.py?a=mes_b&z={}'.format(adresat), data=data, headers=headers)
