@@ -1,7 +1,6 @@
 #!/usr/bin/python3
-import cgi, requests, json, builtins
+import cgi, requests, json, builtins, sys
 builtins.act = 'al'
-from mysql_aut import *
 
 print('Content-type: text/plain\n')
 
@@ -13,10 +12,11 @@ while True:
         js += a
     except EOFError:
         break
+from mysql_aut import *
 
 o = json.loads(js)
 mes = o['message']['text']
-chat_id = mes = o['message']['chat']['id']
+chat_id = o['message']['chat']['id']
 addr = 'https://api.telegram.org/bot{}/sendMessage'.format(open('/var/www/tg_token', 'r').read()[:-1])
 mes = mes.replace('"', "&quot;")
 mes = mes.replace("'", "&#8217;")
@@ -34,9 +34,9 @@ elif o['message']['text'][0] == '!':
     tresc = mes.replace('!' + adresat + ' ', '')
     data = {'content': tresc}
     username = sel_one('select username from notifs where tg="{}"'.format(chat_id))
-    sid = sel_one('select sid from session where username = "{}"'.format(username))
+    sid = sel_one('select sid from sessions where username = "{}"'.format(username))
     if sid == 0:
-        sendmes("Trzeba być zalogowanym, by móc wysyłać wiadomości.")
+        sendmes("{}, trzeba być zalogowanym, by móc wysyłać wiadomości.".format(username))
         exit()
     headers = {'Cookie': 'sid='+sid} 
     requests.post('https://anx.nazwa.pl/xx.py?a=mes_b&z={}'.format(adresat), data=data, headers=headers)

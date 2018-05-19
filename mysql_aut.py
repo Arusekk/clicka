@@ -9,14 +9,20 @@ except NameError:
 try:
 	d
 except (NameError):
-	form = cgi.FieldStorage();
+	try:
+		form = cgi.FieldStorage();
+		assert(len(form))
+	except (TypeError, AssertionError): form = {'':None}
 	d = dict()
 	try:
-		act = form["a"].value
-	except KeyError:
-		act = 'view'
+		act
+	except:
+		try:
+			act = form["a"].value
+		except KeyError:
+			act = 'view'
 	for i in form:
-		if i in ('pic', 'file'):
+		if i in ('pic', 'file', ''):
 			continue
 		v = form[i].value
 		v = cgi.escape(v)
@@ -73,7 +79,9 @@ except NameError:
 			select('insert into activities values ("%s", now(), "%s", "%s")'%(username, os.getenv("REQUEST_URI"), os.getenv('REMOTE_ADDR')))
 		except KeyError: pass
 	except (KeyError, IndexError, NameError):
-		if act not in ('register', 'register_b', 'login_b'):
+		if act not in ('register', 'register_b', 'login_b', 'al'):
+			import sys
+			sys.stderr.write(act+'\n')
 			print("Location: xx.cgi\n")
 			exit(0)
 		username = None
