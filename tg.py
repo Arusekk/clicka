@@ -40,6 +40,11 @@ if sid == 0:
 
 if o['message']['text'][0] == '!':
     adresat = mes.split(' ', 1)[0][1:]
+    if adresat == '!':
+        adresat = sel_one('select do from messages where od="{}" group by do order by max(czas) desc limit 1'.format(username))
+    if adresat not in imiona.keys():
+        sendmes('Użytkownik {} nie istnieje.'.format(adresat))
+        exit()    
     tresc = mes.replace('!' + adresat + ' ', '')
     data = {'content': tresc}
     requests.post('https://anx.nazwa.pl/xx.py?a=mes_b&z={}'.format(adresat), data=data, headers=headers)
